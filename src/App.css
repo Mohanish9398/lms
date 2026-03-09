@@ -1,38 +1,137 @@
-.App {
-  text-align: center;
+.course-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.course-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  background: linear-gradient(135deg, #b8d4e8, #d9eaf5, #F3E3D0) !important;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.btn.explore-btn {
+  background-color: #81A6C6 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: bold !important;
+  transition: background-color 0.3s ease !important;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.btn.explore-btn:hover {
+  background-color: #000000 !important;
+  color: #ffffff !important;
 }
 
-.App-link {
-  color: #61dafb;
+body.dark-mode {
+  background-color: #2d2d2d !important;
+  color: #F3E3D0 !important;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+body.dark-mode .navbar {
+  background-color: #1f1f1f !important;
+  border-bottom: 1px solid #444 !important;
+}
+
+body.dark-mode .nav-link,
+body.dark-mode .navbar-brand {
+  color: #F3E3D0 !important;
+}
+
+body.dark-mode div[style] {
+  background-color: #2d2d2d !important;
+}
+
+body.dark-mode .container,
+body.dark-mode .container-fluid,
+body.dark-mode .row {
+  background-color: transparent !important;
+}
+
+body.dark-mode .card {
+  background-color: #3a3a3a !important;
+  color: #F3E3D0 !important;
+  border: 1px solid #555 !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .card-title,
+body.dark-mode .card h2,
+body.dark-mode .card h5 {
+  color: #F3E3D0 !important;
+}
+
+body.dark-mode .card p,
+body.dark-mode .card li,
+body.dark-mode .card strong {
+  color: #F3E3D0 !important;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3 {
+  color: #F3E3D0 !important;
+}
+
+body.dark-mode p,
+body.dark-mode li,
+body.dark-mode strong {
+  color: #F3E3D0 !important;
+}
+
+body.dark-mode .form-control {
+  background-color: #3a3a3a !important;
+  color: #F3E3D0 !important;
+  border-color: #555 !important;
+}
+
+body.dark-mode .form-control::placeholder {
+  color: #aaaaaa !important;
+}
+
+body.dark-mode label {
+  color: #F3E3D0 !important;
+}
+
+body.dark-mode .form-check-label {
+  color: #F3E3D0 !important;
+}
+
+body.dark-mode a {
+  color: #81A6C6 !important;
+}
+
+body.dark-mode .alert-danger {
+  background-color: #3a1a1a !important;
+  color: #ff6b6b !important;
+  border-color: #ff6b6b !important;
+}
+
+body.dark-mode footer {
+  background-color: #1f1f1f !important;
+  color: #F3E3D0 !important;
+}
+
+body.dark-mode iframe {
+  border: 2px solid #555 !important;
+  border-radius: 12px !important;
+}
+
+body.dark-mode::-webkit-scrollbar {
+  width: 8px;
+}
+
+body.dark-mode::-webkit-scrollbar-track {
+  background: #2d2d2d;
+}
+
+body.dark-mode::-webkit-scrollbar-thumb {
+  background: #81A6C6;
+  border-radius: 4px;
+}
+body.dark-mode .landing-page,
+body.dark-mode .landing-page * {
+  background-color: unset !important;
+  color: unset !important;
+  border-color: unset !important;
 }
