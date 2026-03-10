@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { loginUser } from '../Services/API'
 
 function Login() {
   const navigate = useNavigate()
@@ -7,32 +8,35 @@ function Login() {
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!email || !password) {
       setError('Please enter both email and password.')
       return
     }
-
-    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]')
-    const matchedUser = existingUsers.find(u => u.email === email && u.password === password)
-
-    if (!matchedUser) {
-      setError('Invalid credentials. Please signup first or check your email and password.')
-      return
+    setLoading(true)
+    try {
+      const data = await loginUser(email, password)
+      if (data.token && data.user.role === 'user') {
+        const storage = rememberMe ? localStorage : sessionStorage
+        storage.setItem('token', data.token)
+        storage.setItem('isLoggedIn', 'true')
+        storage.setItem('userEmail', data.user.email)
+        storage.setItem('userName', data.user.name)
+        storage.setItem('userRole', data.user.role)
+        storage.setItem('userId', data.user.id)
+        navigate('/home')
+      } else if (data.token && data.user.role === 'admin') {
+        setError('Please use the Admin Login page.')
+      } else {
+        setError(data.message || 'Invalid credentials.')
+      }
+    } catch (err) {
+      setError('Server error. Please try again.')
     }
-
-    if (rememberMe) {
-      localStorage.setItem('isLoggedIn', 'true')
-      localStorage.setItem('userEmail', email)
-    } else {
-      sessionStorage.setItem('isLoggedIn', 'true')
-      sessionStorage.setItem('userEmail', email)
-    }
-
-    setError('')
-    navigate('/Mycourses')
+    setLoading(false)
   }
 
   return (
@@ -53,27 +57,28 @@ function Login() {
         </div>
         <div className="mb-4 d-flex justify-content-between align-items-center">
           <div className="form-check">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id="rememberMe"
-              checked={rememberMe}
-              onChange={e => setRememberMe(e.target.checked)}
-            />
-            <label className="form-check-label" htmlFor="rememberMe" style={{ color: '#1a1a2e' }}>
-              Remember Me
-            </label>
+            <input className="form-check-input" type="checkbox" id="rememberMe" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} />
+            <label className="form-check-label" htmlFor="rememberMe" style={{ color: '#1a1a2e' }}>Remember Me</label>
           </div>
           <Link to="#" style={{ color: '#81A6C6', fontSize: '14px' }}>Forgot Password?</Link>
         </div>
 
-        <button onClick={handleSubmit} style={{ width: '100%', padding: '12px', backgroundColor: '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '16px', cursor: 'pointer' }}>
-          Login
+        <button onClick={handleSubmit} disabled={loading} style={{ width: '100%', padding: '12px', backgroundColor: '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '16px', cursor: 'pointer' }}>
+          {loading ? 'Logging in...' : 'Login'}
         </button>
 
         <p style={{ textAlign: 'center', marginTop: '20px', color: '#666' }}>
           Don't have an account? <Link to="/Signup" style={{ color: '#81A6C6', fontWeight: '600' }}>Sign Up</Link>
         </p>
+
+        <div style={{ textAlign: 'center', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #D2C4B4' }}>
+          <span
+            onClick={() => navigate('/AdminLogin')}
+            style={{ color: '#f5a623', fontWeight: '600', cursor: 'pointer', fontSize: '14px' }}
+          >
+            🛠️ Admin Login
+          </span>
+        </div>
       </div>
     </div>
   )

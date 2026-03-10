@@ -1,36 +1,46 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { fetchCourse, enrollCourse } from '../Services/API'
 
 function Coursedetails() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [course, setCourse] = useState(null)
   const [enrolled, setEnrolled] = useState(false)
-
-  const userEmail = localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail') || ''
-  const enrollmentKey = `enrolledCourses_${userEmail}`
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    fetch(`http://localhost:3001/courses/${id}`)
-      .then(res => res.json())
-      .then(data => {
-        setCourse(data)
-        const enrolledList = JSON.parse(localStorage.getItem(enrollmentKey) || '[]')
-        setEnrolled(enrolledList.some(c => c.id === data.id))
+    fetchCourse(id).then(data => setCourse(data))
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+    if (token) {
+      fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/courses/enrolled/my`, {
+        headers: { Authorization: `Bearer ${token}` }
       })
-  }, [id, enrollmentKey])
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            setEnrolled(data.some(c => c._id === id))
+          }
+        })
+    }
+  }, [id])
 
-  const handleEnroll = () => {
-    if (!userEmail) {
+  const handleEnroll = async () => {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+    if (!token) {
       alert('Please login first to enroll in a course.')
       navigate('/Login')
       return
     }
-    const enrolledCourses = JSON.parse(localStorage.getItem(enrollmentKey) || '[]')
-    enrolledCourses.push(course)
-    localStorage.setItem(enrollmentKey, JSON.stringify(enrolledCourses))
-    setEnrolled(true)
-    navigate('/Mycourses')
+    setLoading(true)
+    const data = await enrollCourse(id)
+    if (data.message === 'Enrolled successfully') {
+      setEnrolled(true)
+      navigate('/Mycourses')
+    } else {
+      alert(data.message)
+    }
+    setLoading(false)
   }
 
   if (!course) return <div className="text-center mt-5">Loading...</div>
@@ -61,23 +71,16 @@ function Coursedetails() {
               <div className="mt-3 d-flex gap-3">
                 <button
                   onClick={handleEnroll}
-                  disabled={enrolled}
+                  disabled={enrolled || loading}
                   style={{
                     padding: '10px 28px', backgroundColor: enrolled ? '#aaa' : '#1a1a2e',
                     color: '#F3E3D0', border: 'none', borderRadius: '8px',
                     fontWeight: '700', cursor: enrolled ? 'not-allowed' : 'pointer'
                   }}
                 >
-                  {enrolled ? 'Already Enrolled' : 'Enroll Now'}
+                  {enrolled ? 'Already Enrolled' : loading ? 'Enrolling...' : 'Enroll Now'}
                 </button>
-                <button
-                  onClick={() => navigate('/home')}
-                  style={{
-                    padding: '10px 28px', backgroundColor: '#81A6C6',
-                    color: '#fff', border: 'none', borderRadius: '8px',
-                    fontWeight: '700', cursor: 'pointer'
-                  }}
-                >
+                <button onClick={() => navigate('/home')} style={{ padding: '10px 28px', backgroundColor: '#81A6C6', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: '700', cursor: 'pointer' }}>
                   Back to Courses
                 </button>
               </div>

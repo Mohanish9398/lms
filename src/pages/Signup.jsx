@@ -1,16 +1,18 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { signupUser } from '../Services/API'
 
 function Signup() {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirm: '' })
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!formData.name || !formData.email || !formData.password || !formData.confirm) {
       setError('All fields are required.')
@@ -20,20 +22,18 @@ function Signup() {
       setError('Passwords do not match.')
       return
     }
-
-    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]')
-    const alreadyExists = existingUsers.find(u => u.email === formData.email)
-    if (alreadyExists) {
-      setError('An account with this email already exists.')
-      return
+    setLoading(true)
+    try {
+      const data = await signupUser(formData.name, formData.email, formData.password)
+      if (data.message === 'Account created successfully') {
+        navigate('/Login')
+      } else {
+        setError(data.message || 'Signup failed.')
+      }
+    } catch (err) {
+      setError('Server error. Please try again.')
     }
-
-    const newUser = { name: formData.name, email: formData.email, password: formData.password }
-    existingUsers.push(newUser)
-    localStorage.setItem('users', JSON.stringify(existingUsers))
-
-    setError('')
-    navigate('/Login')
+    setLoading(false)
   }
 
   return (
@@ -61,8 +61,8 @@ function Signup() {
           <input type="password" name="confirm" className="form-control mt-1" placeholder="Confirm your password" value={formData.confirm} onChange={handleChange} />
         </div>
 
-        <button onClick={handleSubmit} style={{ width: '100%', padding: '12px', backgroundColor: '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '16px', cursor: 'pointer' }}>
-          Sign Up
+        <button onClick={handleSubmit} disabled={loading} style={{ width: '100%', padding: '12px', backgroundColor: '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '16px', cursor: 'pointer' }}>
+          {loading ? 'Creating Account...' : 'Sign Up'}
         </button>
 
         <p style={{ textAlign: 'center', marginTop: '20px', color: '#666' }}>

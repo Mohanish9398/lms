@@ -7,12 +7,12 @@ function Navbar() {
   const [darkMode, setDarkMode] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const navigate = useNavigate()
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true' || sessionStorage.getItem('isLoggedIn') === 'true'
-  const userEmail = localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail') || ''
-  const users = JSON.parse(localStorage.getItem('users') || '[]')
-  const currentUser = users.find(u => u.email === userEmail)
-  const userName = currentUser ? currentUser.name : userEmail
   const dropdownRef = useRef(null)
+
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true' || sessionStorage.getItem('isLoggedIn') === 'true'
+  const userRole = localStorage.getItem('userRole') || sessionStorage.getItem('userRole') || ''
+  const userEmail = localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail') || ''
+  const userName = localStorage.getItem('userName') || sessionStorage.getItem('userName') || userEmail
 
   useEffect(() => {
     const savedMode = localStorage.getItem('darkMode') === 'true'
@@ -49,8 +49,16 @@ function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn')
     localStorage.removeItem('userEmail')
+    localStorage.removeItem('userName')
+    localStorage.removeItem('userRole')
+    localStorage.removeItem('userId')
+    localStorage.removeItem('token')
     sessionStorage.removeItem('isLoggedIn')
     sessionStorage.removeItem('userEmail')
+    sessionStorage.removeItem('userName')
+    sessionStorage.removeItem('userRole')
+    sessionStorage.removeItem('userId')
+    sessionStorage.removeItem('token')
     setDropdownOpen(false)
     navigate('/Login')
   }
@@ -61,7 +69,7 @@ function Navbar() {
         <Link className="navbar-brand" to="/">
           <img src={logo} alt="TechPath Logo" height="50" />
         </Link>
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
@@ -69,9 +77,16 @@ function Navbar() {
             <li className="nav-item">
               <Link className="nav-link active" to="/home">Home</Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/Mycourses">Mycourses</Link>
-            </li>
+            {isLoggedIn && userRole !== 'admin' && (
+              <li className="nav-item">
+                <Link className="nav-link" to="/Mycourses">My Courses</Link>
+              </li>
+            )}
+            {isLoggedIn && userRole === 'admin' && (
+              <li className="nav-item">
+                <Link className="nav-link" to="/Admin">Admin Dashboard</Link>
+              </li>
+            )}
             {!isLoggedIn && (
               <li className="nav-item">
                 <Link className="nav-link" to="/Login">Login</Link>
@@ -84,7 +99,6 @@ function Navbar() {
               className="form-control me-2"
               type="search"
               placeholder="Search"
-              aria-label="Search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -146,33 +160,44 @@ function Navbar() {
                   boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
                   minWidth: '220px', zIndex: 1000, overflow: 'hidden'
                 }}>
-                  <div style={{
-                    padding: '16px 20px',
-                    borderBottom: '1px solid #D2C4B4',
-                    backgroundColor: '#1a1a2e'
-                  }}>
+                  <div style={{ padding: '16px 20px', borderBottom: '1px solid #D2C4B4', backgroundColor: '#1a1a2e' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{
                         width: '42px', height: '42px', borderRadius: '50%',
                         backgroundColor: '#81A6C6', display: 'flex',
                         alignItems: 'center', justifyContent: 'center',
-                        fontWeight: '800', fontSize: '18px', color: '#1a1a2e',
-                        flexShrink: 0
+                        fontWeight: '800', fontSize: '18px', color: '#1a1a2e', flexShrink: 0
                       }}>
                         {userName.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <div style={{ fontWeight: '700', color: '#F3E3D0', fontSize: '15px' }}>
-                          {userName}
-                        </div>
-                        <div style={{ fontSize: '12px', color: '#81A6C6', marginTop: '2px' }}>
-                          {userEmail}
-                        </div>
+                        <div style={{ fontWeight: '700', color: '#F3E3D0', fontSize: '15px' }}>{userName}</div>
+                        <div style={{ fontSize: '12px', color: '#81A6C6', marginTop: '2px' }}>{userEmail}</div>
+                        {userRole === 'admin' && (
+                          <div style={{ fontSize: '11px', color: '#f5a623', marginTop: '2px', fontWeight: '700' }}>⭐ Admin</div>
+                        )}
                       </div>
                     </div>
                   </div>
 
                   <div style={{ padding: '8px' }}>
+                    {userRole === 'admin' && (
+                      <button
+                        onClick={() => { navigate('/Admin'); setDropdownOpen(false) }}
+                        style={{
+                          width: '100%', padding: '10px 14px',
+                          backgroundColor: 'transparent', border: 'none',
+                          borderRadius: '8px', textAlign: 'left',
+                          color: '#1a1a2e', fontWeight: '700',
+                          fontSize: '14px', cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', gap: '8px'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.backgroundColor = '#D2C4B4'}
+                        onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                      >
+                        🛠️ Admin Dashboard
+                      </button>
+                    )}
                     <button
                       onClick={handleLogout}
                       style={{
@@ -193,7 +218,6 @@ function Navbar() {
               )}
             </div>
           )}
-
         </div>
       </div>
     </nav>
