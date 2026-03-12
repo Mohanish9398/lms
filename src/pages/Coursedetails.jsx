@@ -18,20 +18,14 @@ function Coursedetails() {
       })
         .then(res => res.json())
         .then(data => {
-          if (Array.isArray(data)) {
-            setEnrolled(data.some(c => c._id === id))
-          }
+          if (Array.isArray(data)) setEnrolled(data.some(c => c._id === id))
         })
     }
   }, [id])
 
   const handleEnroll = async () => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token')
-    if (!token) {
-      alert('Please login first to enroll in a course.')
-      navigate('/Login')
-      return
-    }
+    if (!token) { alert('Please login first to enroll in a course.'); navigate('/Login'); return }
     setLoading(true)
     const data = await enrollCourse(id)
     if (data.message === 'Enrolled successfully') {
@@ -72,11 +66,7 @@ function Coursedetails() {
                 <button
                   onClick={handleEnroll}
                   disabled={enrolled || loading}
-                  style={{
-                    padding: '10px 28px', backgroundColor: enrolled ? '#aaa' : '#1a1a2e',
-                    color: '#F3E3D0', border: 'none', borderRadius: '8px',
-                    fontWeight: '700', cursor: enrolled ? 'not-allowed' : 'pointer'
-                  }}
+                  style={{ padding: '10px 28px', backgroundColor: enrolled ? '#aaa' : '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '8px', fontWeight: '700', cursor: enrolled ? 'not-allowed' : 'pointer' }}
                 >
                   {enrolled ? 'Already Enrolled' : loading ? 'Enrolling...' : 'Enroll Now'}
                 </button>

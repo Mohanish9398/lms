@@ -121,9 +121,10 @@ function Navbar() {
               backgroundColor: darkMode ? '#1a1a2e' : '#F3E3D0',
               transition: 'left 0.3s ease',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '12px'
+              fontSize: '11px', fontWeight: '800',
+              color: darkMode ? '#F3E3D0' : '#1a1a2e'
             }}>
-              {darkMode ? '☀️' : '🌙'}
+              {darkMode ? 'D' : 'L'}
             </div>
           </div>
 
@@ -174,7 +175,7 @@ function Navbar() {
                         <div style={{ fontWeight: '700', color: '#F3E3D0', fontSize: '15px' }}>{userName}</div>
                         <div style={{ fontSize: '12px', color: '#81A6C6', marginTop: '2px' }}>{userEmail}</div>
                         {userRole === 'admin' && (
-                          <div style={{ fontSize: '11px', color: '#f5a623', marginTop: '2px', fontWeight: '700' }}>⭐ Admin</div>
+                          <div style={{ fontSize: '11px', color: '#f5a623', marginTop: '2px', fontWeight: '700' }}>Admin</div>
                         )}
                       </div>
                     </div>
@@ -195,7 +196,7 @@ function Navbar() {
                         onMouseEnter={e => e.currentTarget.style.backgroundColor = '#D2C4B4'}
                         onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
                       >
-                        🛠️ Admin Dashboard
+                        Admin Dashboard
                       </button>
                     )}
                     <button
@@ -211,7 +212,7 @@ function Navbar() {
                       onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f8d7da'}
                       onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
                     >
-                      🚪 Logout
+                      Logout
                     </button>
                   </div>
                 </div>

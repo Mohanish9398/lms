@@ -10,12 +10,8 @@ function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!email || !password) {
-      setError('Please enter both email and password.')
-      return
-    }
+  const handleSubmit = async () => {
+    if (!email || !password) { setError('Please enter both email and password.'); return }
     setLoading(true)
     try {
       const data = await loginUser(email, password)
@@ -49,11 +45,11 @@ function Login() {
 
         <div className="mb-3">
           <label style={{ fontWeight: '600', color: '#1a1a2e' }}>Email</label>
-          <input type="email" className="form-control mt-1" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} />
+          <input type="email" className="form-control mt-1" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSubmit()} />
         </div>
         <div className="mb-3">
           <label style={{ fontWeight: '600', color: '#1a1a2e' }}>Password</label>
-          <input type="password" className="form-control mt-1" placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} />
+          <input type="password" className="form-control mt-1" placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSubmit()} />
         </div>
         <div className="mb-4 d-flex justify-content-between align-items-center">
           <div className="form-check">
@@ -72,11 +68,8 @@ function Login() {
         </p>
 
         <div style={{ textAlign: 'center', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #D2C4B4' }}>
-          <span
-            onClick={() => navigate('/AdminLogin')}
-            style={{ color: '#f5a623', fontWeight: '600', cursor: 'pointer', fontSize: '14px' }}
-          >
-            🛠️ Admin Login
+          <span onClick={() => navigate('/AdminLogin')} style={{ color: '#f5a623', fontWeight: '600', cursor: 'pointer', fontSize: '14px' }}>
+            Admin Login
           </span>
         </div>
       </div>

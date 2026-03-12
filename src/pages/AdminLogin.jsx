@@ -52,9 +52,10 @@ function AdminLogin() {
             width: '64px', height: '64px', borderRadius: '50%',
             backgroundColor: '#f5a623', display: 'flex',
             alignItems: 'center', justifyContent: 'center',
-            fontSize: '28px', margin: '0 auto 12px'
+            fontSize: '22px', fontWeight: '800', color: '#1a1a2e',
+            margin: '0 auto 12px'
           }}>
-            🛠️
+            A
           </div>
           <h2 style={{ color: '#F3E3D0', fontWeight: '800', marginBottom: '4px' }}>Admin Login</h2>
           <p style={{ color: '#81A6C6', fontSize: '14px' }}>TechPath Administration Panel</p>
@@ -66,7 +67,7 @@ function AdminLogin() {
             borderRadius: '8px', padding: '12px 16px',
             color: '#e74c3c', marginBottom: '20px', fontSize: '14px'
           }}>
-            ⚠️ {error}
+            {error}
           </div>
         )}
 
@@ -106,7 +107,7 @@ function AdminLogin() {
             transition: 'opacity 0.2s'
           }}
         >
-          {loading ? 'Verifying...' : '🔐 Login as Admin'}
+          {loading ? 'Verifying...' : 'Login as Admin'}
         </button>
 
         <p style={{ textAlign: 'center', marginTop: '20px', color: '#81A6C6', fontSize: '13px' }}>

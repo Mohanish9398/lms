@@ -116,11 +116,11 @@ function Admin() {
     })
     const data = await res.json()
     if (data._id || data.title) {
-      showMsg(editingCourse ? '✅ Course updated!' : '✅ Course added!')
+      showMsg(editingCourse ? 'Course updated!' : 'Course added!')
       resetForm()
       loadCourses()
     } else {
-      showMsg('❌ Something went wrong.', 'error')
+      showMsg('Something went wrong.', 'error')
     }
   }
 
@@ -139,7 +139,7 @@ function Admin() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this course? Enrolled users will be unenrolled.')) return
     await fetch(`${BASE_URL}/api/courses/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } })
-    showMsg('🗑️ Course deleted.')
+    showMsg('Course deleted.')
     loadCourses()
   }
 
@@ -166,7 +166,7 @@ function Admin() {
     })
     const data = await res.json()
     if (data._id) {
-      showMsg('✅ User updated!')
+      showMsg('User updated!')
       setEditingUser(null)
       loadUsers()
       if (selectedUser?._id === userId) setSelectedUser({ ...selectedUser, ...userForm })
@@ -176,7 +176,7 @@ function Admin() {
   const handleDeleteUser = async (userId) => {
     if (!window.confirm('Delete this user permanently?')) return
     await fetch(`${BASE_URL}/api/auth/users/${userId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } })
-    showMsg('🗑️ User deleted.')
+    showMsg('User deleted.')
     setSelectedUser(null)
     loadUsers()
   }
@@ -190,21 +190,21 @@ function Admin() {
   }
 
   const handleResetPassword = async (userId) => {
-    if (!resetPassword.value) return showMsg('❌ Enter a new password', 'error')
+    if (!resetPassword.value) return showMsg('Enter a new password', 'error')
     const res = await fetch(`${BASE_URL}/api/auth/users/${userId}/reset-password`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ newPassword: resetPassword.value })
     })
     const data = await res.json()
-    showMsg('✅ ' + data.message)
+    showMsg(data.message)
     setResetPassword({ userId: null, value: '' })
   }
 
   const handleUnenrollUser = async (userId, courseId) => {
     if (!window.confirm('Unenroll this user from the course?')) return
     await fetch(`${BASE_URL}/api/auth/users/${userId}/unenroll/${courseId}`, { method: 'PUT', headers: { Authorization: `Bearer ${token}` } })
-    showMsg('✅ User unenrolled.')
+    showMsg('User unenrolled.')
     loadUsers()
     const updated = await fetch(`${BASE_URL}/api/auth/users/${userId}`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json())
     setSelectedUser(updated)
@@ -221,7 +221,7 @@ function Admin() {
   return (
     <div style={{ backgroundColor: '#81A6C6', minHeight: '100vh', padding: '40px 20px' }}>
       <div className="container">
-        <h2 style={{ color: '#F3E3D0', fontWeight: '800', marginBottom: '6px' }}>🛠️ Admin Dashboard</h2>
+        <h2 style={{ color: '#F3E3D0', fontWeight: '800', marginBottom: '6px' }}>Admin Dashboard</h2>
         <p style={{ color: '#F3E3D0', opacity: 0.85, marginBottom: '24px' }}>Manage courses and users</p>
 
         {message.text && (
@@ -231,25 +231,25 @@ function Admin() {
         )}
 
         <div style={{ backgroundColor: '#F3E3D0', borderRadius: '12px', padding: '8px', display: 'inline-flex', gap: '4px', marginBottom: '24px' }}>
-          <button style={tabStyle('courses')} onClick={() => setActiveTab('courses')}>📚 Courses ({courses.length})</button>
-          <button style={tabStyle('users')} onClick={() => setActiveTab('users')}>👥 Users ({users.length})</button>
+          <button style={tabStyle('courses')} onClick={() => setActiveTab('courses')}>Courses ({courses.length})</button>
+          <button style={tabStyle('users')} onClick={() => setActiveTab('users')}>Users ({users.length})</button>
         </div>
 
-        {/* ─── COURSES TAB ─── */}
+        {/* COURSES TAB */}
         {activeTab === 'courses' && (
           <div>
             {selectedCourse ? (
               <div>
-                <button onClick={() => setSelectedCourse(null)} style={{ backgroundColor: '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '8px', padding: '8px 20px', fontWeight: '700', cursor: 'pointer', marginBottom: '20px' }}>← Back to Courses</button>
+                <button onClick={() => setSelectedCourse(null)} style={{ backgroundColor: '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '8px', padding: '8px 20px', fontWeight: '700', cursor: 'pointer', marginBottom: '20px' }}>Back to Courses</button>
                 <div style={{ backgroundColor: '#F3E3D0', borderRadius: '16px', padding: '30px' }}>
                   <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '20px' }}>
                     <img src={selectedCourse.image} alt={selectedCourse.title} style={{ width: '60px', height: '60px', objectFit: 'contain', backgroundColor: '#fff', padding: '6px', borderRadius: '10px' }} />
                     <div>
                       <h4 style={{ fontWeight: '800', color: '#1a1a2e', margin: 0 }}>{selectedCourse.title}</h4>
-                      <p style={{ color: '#666', margin: 0, fontSize: '13px' }}>👨‍🏫 {selectedCourse.instructor} | ⏱ {selectedCourse.duration}</p>
+                      <p style={{ color: '#666', margin: 0, fontSize: '13px' }}>{selectedCourse.instructor} | {selectedCourse.duration}</p>
                     </div>
                   </div>
-                  <h5 style={{ fontWeight: '700', color: '#1a1a2e', marginBottom: '16px' }}>👥 Enrolled Students ({courseStudents.length})</h5>
+                  <h5 style={{ fontWeight: '700', color: '#1a1a2e', marginBottom: '16px' }}>Enrolled Students ({courseStudents.length})</h5>
                   {courseStudents.length === 0 ? (
                     <p style={{ color: '#666' }}>No students enrolled yet.</p>
                   ) : (
@@ -275,19 +275,19 @@ function Admin() {
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
                   <input
-                    placeholder="🔍 Search courses by title or instructor..."
+                    placeholder="Search courses by title or instructor..."
                     value={courseSearch}
                     onChange={e => setCourseSearch(e.target.value)}
                     style={{ ...inputStyle, maxWidth: '360px', backgroundColor: '#F3E3D0' }}
                   />
                   <button onClick={() => showForm ? resetForm() : setShowForm(true)} style={{ backgroundColor: '#27ae60', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 20px', fontWeight: '700', cursor: 'pointer' }}>
-                    {showForm ? '✕ Cancel' : '+ Add Course'}
+                    {showForm ? 'Cancel' : '+ Add Course'}
                   </button>
                 </div>
 
                 {showForm && (
                   <div style={{ backgroundColor: '#F3E3D0', borderRadius: '16px', padding: '30px', marginBottom: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
-                    <h5 style={{ fontWeight: '700', color: '#1a1a2e', marginBottom: '20px' }}>{editingCourse ? '✏️ Edit Course' : '➕ Add New Course'}</h5>
+                    <h5 style={{ fontWeight: '700', color: '#1a1a2e', marginBottom: '20px' }}>{editingCourse ? 'Edit Course' : 'Add New Course'}</h5>
                     <div className="row g-3">
                       <div className="col-md-6"><label style={{ fontWeight: '600' }}>Title</label><input name="title" className="form-control mt-1" value={form.title} onChange={handleFormChange} placeholder="Course title" /></div>
                       <div className="col-md-6"><label style={{ fontWeight: '600' }}>Instructor</label><input name="instructor" className="form-control mt-1" value={form.instructor} onChange={handleFormChange} placeholder="Instructor name" /></div>
@@ -297,14 +297,14 @@ function Admin() {
                           <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
                         </select>
                       </div>
-                      <div className="col-md-4"><label style={{ fontWeight: '600' }}>Price</label><input name="price" className="form-control mt-1" value={form.price} onChange={handleFormChange} placeholder="Free or ₹499" /></div>
+                      <div className="col-md-4"><label style={{ fontWeight: '600' }}>Price</label><input name="price" className="form-control mt-1" value={form.price} onChange={handleFormChange} placeholder="Free or Rs.499" /></div>
                       <div className="col-md-6"><label style={{ fontWeight: '600' }}>Image URL</label><input name="image" className="form-control mt-1" value={form.image} onChange={handleFormChange} placeholder="https://..." /></div>
                       <div className="col-md-6"><label style={{ fontWeight: '600' }}>Main Video URL (YouTube embed)</label><input name="video" className="form-control mt-1" value={form.video} onChange={handleFormChange} placeholder="https://www.youtube.com/embed/..." /></div>
                       <div className="col-12"><label style={{ fontWeight: '600' }}>Description</label><textarea name="description" className="form-control mt-1" rows="2" value={form.description} onChange={handleFormChange} /></div>
                       <div className="col-12"><label style={{ fontWeight: '600' }}>Topics (one per line)</label><textarea name="topics" className="form-control mt-1" rows="3" value={form.topics} onChange={handleFormChange} placeholder="Topic 1&#10;Topic 2" /></div>
 
                       <div className="col-12">
-                        <label style={{ fontWeight: '700', fontSize: '15px' }}>📹 Lessons</label>
+                        <label style={{ fontWeight: '700', fontSize: '15px' }}>Lessons</label>
                         <div style={{ border: '1px solid #D2C4B4', borderRadius: '8px', padding: '16px', marginTop: '8px', backgroundColor: '#fff' }}>
                           {form.lessons.length === 0 && <p style={{ color: '#888', fontSize: '13px', textAlign: 'center' }}>No lessons added yet.</p>}
                           {form.lessons.map((lesson, index) => (
@@ -312,9 +312,9 @@ function Admin() {
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                                 <span style={{ fontWeight: '700', fontSize: '13px' }}>Lesson {index + 1}</span>
                                 <div style={{ display: 'flex', gap: '6px' }}>
-                                  <button onClick={() => handleMoveLessonUp(index)} disabled={index === 0} style={{ backgroundColor: '#81A6C6', color: '#fff', border: 'none', borderRadius: '4px', padding: '3px 8px', cursor: 'pointer', fontSize: '12px', opacity: index === 0 ? 0.4 : 1 }}>↑</button>
-                                  <button onClick={() => handleMoveLessonDown(index)} disabled={index === form.lessons.length - 1} style={{ backgroundColor: '#81A6C6', color: '#fff', border: 'none', borderRadius: '4px', padding: '3px 8px', cursor: 'pointer', fontSize: '12px', opacity: index === form.lessons.length - 1 ? 0.4 : 1 }}>↓</button>
-                                  <button onClick={() => handleRemoveLesson(index)} style={{ backgroundColor: '#c0392b', color: '#fff', border: 'none', borderRadius: '4px', padding: '3px 10px', cursor: 'pointer', fontSize: '12px' }}>✕</button>
+                                  <button onClick={() => handleMoveLessonUp(index)} disabled={index === 0} style={{ backgroundColor: '#81A6C6', color: '#fff', border: 'none', borderRadius: '4px', padding: '3px 8px', cursor: 'pointer', fontSize: '12px', opacity: index === 0 ? 0.4 : 1 }}>Up</button>
+                                  <button onClick={() => handleMoveLessonDown(index)} disabled={index === form.lessons.length - 1} style={{ backgroundColor: '#81A6C6', color: '#fff', border: 'none', borderRadius: '4px', padding: '3px 8px', cursor: 'pointer', fontSize: '12px', opacity: index === form.lessons.length - 1 ? 0.4 : 1 }}>Down</button>
+                                  <button onClick={() => handleRemoveLesson(index)} style={{ backgroundColor: '#c0392b', color: '#fff', border: 'none', borderRadius: '4px', padding: '3px 10px', cursor: 'pointer', fontSize: '12px' }}>Remove</button>
                                 </div>
                               </div>
                               <div className="row g-2">
@@ -342,15 +342,15 @@ function Admin() {
                           <img src={course.image} alt={course.title} style={{ width: '50px', height: '50px', objectFit: 'contain', borderRadius: '8px', backgroundColor: '#fff', padding: '4px', flexShrink: 0 }} />
                           <div style={{ flex: 1 }}>
                             <h6 style={{ fontWeight: '700', color: '#1a1a2e', marginBottom: '4px' }}>{course.title}</h6>
-                            <p style={{ fontSize: '12px', color: '#666', margin: 0 }}>👨‍🏫 {course.instructor} | ⏱ {course.duration}</p>
-                            <p style={{ fontSize: '12px', color: '#666', margin: '2px 0 0' }}>📹 {course.lessons?.length || 0} lessons</p>
+                            <p style={{ fontSize: '12px', color: '#666', margin: 0 }}>{course.instructor} | {course.duration}</p>
+                            <p style={{ fontSize: '12px', color: '#666', margin: '2px 0 0' }}>{course.lessons?.length || 0} lessons</p>
                             <span style={{ fontSize: '11px', backgroundColor: '#81A6C6', color: '#fff', borderRadius: '4px', padding: '2px 8px', display: 'inline-block', marginTop: '4px' }}>{course.level}</span>
                           </div>
                         </div>
                         <div style={{ display: 'flex', gap: '6px', marginTop: '12px', flexWrap: 'wrap' }}>
-                          <button onClick={() => handleEdit(course)} style={{ flex: 1, padding: '6px', backgroundColor: '#f5a623', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', fontSize: '12px' }}>✏️ Edit</button>
-                          <button onClick={() => handleViewCourseStudents(course)} style={{ flex: 1, padding: '6px', backgroundColor: '#81A6C6', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', fontSize: '12px' }}>👥 Students</button>
-                          <button onClick={() => handleDelete(course._id)} style={{ flex: 1, padding: '6px', backgroundColor: '#c0392b', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', fontSize: '12px' }}>🗑️ Delete</button>
+                          <button onClick={() => handleEdit(course)} style={{ flex: 1, padding: '6px', backgroundColor: '#f5a623', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', fontSize: '12px' }}>Edit</button>
+                          <button onClick={() => handleViewCourseStudents(course)} style={{ flex: 1, padding: '6px', backgroundColor: '#81A6C6', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', fontSize: '12px' }}>Students</button>
+                          <button onClick={() => handleDelete(course._id)} style={{ flex: 1, padding: '6px', backgroundColor: '#c0392b', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', fontSize: '12px' }}>Delete</button>
                         </div>
                       </div>
                     </div>
@@ -361,15 +361,14 @@ function Admin() {
           </div>
         )}
 
-        {/* ─── USERS TAB ─── */}
+        {/* USERS TAB */}
         {activeTab === 'users' && (
           <div>
             {selectedUser ? (
               <div>
-                <button onClick={() => { setSelectedUser(null); setEditingUser(null); setResetPassword({ userId: null, value: '' }) }} style={{ backgroundColor: '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '8px', padding: '8px 20px', fontWeight: '700', cursor: 'pointer', marginBottom: '20px' }}>← Back to Users</button>
+                <button onClick={() => { setSelectedUser(null); setEditingUser(null); setResetPassword({ userId: null, value: '' }) }} style={{ backgroundColor: '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '8px', padding: '8px 20px', fontWeight: '700', cursor: 'pointer', marginBottom: '20px' }}>Back to Users</button>
                 <div style={{ backgroundColor: '#F3E3D0', borderRadius: '16px', padding: '30px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
 
-                  {/* User Info */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
                     <div style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: selectedUser.banned ? '#c0392b' : '#1a1a2e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', color: '#F3E3D0', fontWeight: '800', flexShrink: 0 }}>
                       {selectedUser.name.charAt(0).toUpperCase()}
@@ -388,7 +387,9 @@ function Admin() {
                         </div>
                       ) : (
                         <>
-                          <h4 style={{ fontWeight: '800', color: '#1a1a2e', margin: 0 }}>{selectedUser.name} {selectedUser.banned && <span style={{ fontSize: '13px', color: '#c0392b', fontWeight: '700' }}>🚫 BANNED</span>}</h4>
+                          <h4 style={{ fontWeight: '800', color: '#1a1a2e', margin: 0 }}>
+                            {selectedUser.name} {selectedUser.banned && <span style={{ fontSize: '13px', color: '#c0392b', fontWeight: '700' }}>BANNED</span>}
+                          </h4>
                           <p style={{ color: '#666', margin: 0 }}>{selectedUser.email}</p>
                           <p style={{ color: '#888', fontSize: '12px', margin: 0 }}>Role: {selectedUser.role} | Joined: {new Date(selectedUser.createdAt).toLocaleDateString()}</p>
                         </>
@@ -396,20 +397,18 @@ function Admin() {
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '24px' }}>
-                    <button onClick={() => handleEditUser(selectedUser)} style={{ backgroundColor: '#f5a623', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontWeight: '700', cursor: 'pointer', fontSize: '13px' }}>✏️ Edit Details</button>
+                    <button onClick={() => handleEditUser(selectedUser)} style={{ backgroundColor: '#f5a623', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontWeight: '700', cursor: 'pointer', fontSize: '13px' }}>Edit Details</button>
                     <button onClick={() => handleBanUser(selectedUser._id)} style={{ backgroundColor: selectedUser.banned ? '#27ae60' : '#e67e22', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontWeight: '700', cursor: 'pointer', fontSize: '13px' }}>
-                      {selectedUser.banned ? '✅ Unban User' : '🚫 Ban User'}
+                      {selectedUser.banned ? 'Unban User' : 'Ban User'}
                     </button>
-                    <button onClick={() => setResetPassword({ userId: selectedUser._id, value: '' })} style={{ backgroundColor: '#81A6C6', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontWeight: '700', cursor: 'pointer', fontSize: '13px' }}>🔑 Reset Password</button>
-                    <button onClick={() => handleDeleteUser(selectedUser._id)} style={{ backgroundColor: '#c0392b', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontWeight: '700', cursor: 'pointer', fontSize: '13px' }}>🗑️ Delete User</button>
+                    <button onClick={() => setResetPassword({ userId: selectedUser._id, value: '' })} style={{ backgroundColor: '#81A6C6', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontWeight: '700', cursor: 'pointer', fontSize: '13px' }}>Reset Password</button>
+                    <button onClick={() => handleDeleteUser(selectedUser._id)} style={{ backgroundColor: '#c0392b', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontWeight: '700', cursor: 'pointer', fontSize: '13px' }}>Delete User</button>
                   </div>
 
-                  {/* Reset Password Form */}
                   {resetPassword.userId === selectedUser._id && (
                     <div style={{ backgroundColor: '#fff', borderRadius: '10px', padding: '16px', marginBottom: '20px', display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                      <span style={{ fontWeight: '700', fontSize: '13px' }}>🔑 New Password:</span>
+                      <span style={{ fontWeight: '700', fontSize: '13px' }}>New Password:</span>
                       <input
                         type="password"
                         placeholder="Enter new password"
@@ -422,8 +421,7 @@ function Admin() {
                     </div>
                   )}
 
-                  {/* Enrolled Courses */}
-                  <h5 style={{ fontWeight: '700', color: '#1a1a2e', marginBottom: '16px' }}>📚 Enrolled Courses ({selectedUser.enrolledCourses?.length || 0})</h5>
+                  <h5 style={{ fontWeight: '700', color: '#1a1a2e', marginBottom: '16px' }}>Enrolled Courses ({selectedUser.enrolledCourses?.length || 0})</h5>
                   {selectedUser.enrolledCourses?.length === 0 ? (
                     <p style={{ color: '#666' }}>No courses enrolled yet.</p>
                   ) : (
@@ -434,7 +432,7 @@ function Admin() {
                             <img src={course.image} alt={course.title} style={{ width: '40px', height: '40px', objectFit: 'contain', flexShrink: 0 }} />
                             <div style={{ flex: 1 }}>
                               <p style={{ fontWeight: '700', color: '#1a1a2e', margin: 0, fontSize: '13px' }}>{course.title}</p>
-                              <p style={{ color: '#666', margin: 0, fontSize: '12px' }}>⏱ {course.duration}</p>
+                              <p style={{ color: '#666', margin: 0, fontSize: '12px' }}>{course.duration}</p>
                             </div>
                             <button onClick={() => handleUnenrollUser(selectedUser._id, course._id)} style={{ backgroundColor: '#c0392b', color: '#fff', border: 'none', borderRadius: '6px', padding: '4px 8px', cursor: 'pointer', fontSize: '11px', fontWeight: '700', flexShrink: 0 }}>Unenroll</button>
                           </div>
@@ -448,7 +446,7 @@ function Admin() {
               <>
                 <div style={{ marginBottom: '16px' }}>
                   <input
-                    placeholder="🔍 Search users by name or email..."
+                    placeholder="Search users by name or email..."
                     value={userSearch}
                     onChange={e => setUserSearch(e.target.value)}
                     style={{ ...inputStyle, maxWidth: '360px', backgroundColor: '#F3E3D0' }}
@@ -469,15 +467,15 @@ function Admin() {
                               {user.role === 'admin' && <span style={{ fontSize: '10px', backgroundColor: '#f5a623', color: '#fff', borderRadius: '4px', padding: '1px 6px' }}>ADMIN</span>}
                             </h6>
                             <p style={{ fontSize: '12px', color: '#666', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</p>
-                            <p style={{ fontSize: '12px', color: '#81A6C6', margin: 0, fontWeight: '600' }}>📚 {user.enrolledCourses?.length || 0} courses</p>
+                            <p style={{ fontSize: '12px', color: '#81A6C6', margin: 0, fontWeight: '600' }}>{user.enrolledCourses?.length || 0} courses</p>
                           </div>
                         </div>
                         <div style={{ display: 'flex', gap: '6px' }}>
-                          <button onClick={() => setSelectedUser(user)} style={{ flex: 2, padding: '6px', backgroundColor: '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', fontSize: '12px' }}>👁 View</button>
+                          <button onClick={() => setSelectedUser(user)} style={{ flex: 2, padding: '6px', backgroundColor: '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', fontSize: '12px' }}>View</button>
                           <button onClick={() => handleBanUser(user._id)} style={{ flex: 1, padding: '6px', backgroundColor: user.banned ? '#27ae60' : '#e67e22', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', fontSize: '12px' }}>
-                            {user.banned ? '✅' : '🚫'}
+                            {user.banned ? 'Unban' : 'Ban'}
                           </button>
-                          <button onClick={() => handleDeleteUser(user._id)} style={{ flex: 1, padding: '6px', backgroundColor: '#c0392b', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', fontSize: '12px' }}>🗑️</button>
+                          <button onClick={() => handleDeleteUser(user._id)} style={{ flex: 1, padding: '6px', backgroundColor: '#c0392b', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', fontSize: '12px' }}>Delete</button>
                         </div>
                       </div>
                     </div>

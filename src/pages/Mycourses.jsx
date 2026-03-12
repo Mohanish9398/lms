@@ -11,10 +11,7 @@ function Mycourses() {
 
   useEffect(() => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token')
-    if (!token) {
-      navigate('/Login')
-      return
-    }
+    if (!token) { navigate('/Login'); return }
     fetchMyCourses().then(data => {
       if (Array.isArray(data)) setEnrolledCourses(data)
     })
@@ -37,10 +34,6 @@ function Mycourses() {
     localStorage.setItem(progressKey, JSON.stringify(allProgress))
   }
 
-  const handleStartLearning = (id) => {
-    navigate(`/Player/${id}`)
-  }
-
   const getProgressColor = (value) => {
     if (value === 100) return '#27ae60'
     if (value >= 50) return '#f5a623'
@@ -48,9 +41,9 @@ function Mycourses() {
   }
 
   const getProgressLabel = (value) => {
-    if (value === 100) return '✅ Completed'
-    if (value >= 50) return '🔥 In Progress'
-    return '📚 Not Started'
+    if (value === 100) return 'Completed'
+    if (value >= 50) return 'In Progress'
+    return 'Not Started'
   }
 
   return (
@@ -104,10 +97,10 @@ function Mycourses() {
                         <div>
                           <h5 style={{ color: '#1a1a2e', fontWeight: '700', marginBottom: '4px' }}>{course.title}</h5>
                           <p style={{ fontSize: '13px', color: '#666', marginBottom: '4px' }}>
-                            👨‍🏫 {course.instructor} &nbsp;|&nbsp; ⏱ {course.duration}
+                            {course.instructor} &nbsp;|&nbsp; {course.duration}
                           </p>
                           <p style={{ fontSize: '12px', color: '#888', marginBottom: '12px' }}>
-                            📹 {course.lessons?.length || 0} lessons
+                            {course.lessons?.length || 0} lessons
                           </p>
                           <div style={{ marginBottom: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <span style={{ fontSize: '13px', fontWeight: '600', color: getProgressColor(progress) }}>
@@ -127,10 +120,10 @@ function Mycourses() {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           <button
-                            onClick={() => handleStartLearning(course._id)}
+                            onClick={() => navigate(`/Player/${course._id}`)}
                             style={{ backgroundColor: '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '8px', padding: '9px', fontWeight: '700', cursor: 'pointer', fontSize: '14px' }}
                           >
-                            {progress === 100 ? '🔁 Rewatch' : '▶ Start Learning'}
+                            {progress === 100 ? 'Rewatch' : 'Start Learning'}
                           </button>
                           <button
                             onClick={() => handleUnenroll(course._id)}

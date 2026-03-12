@@ -41,17 +41,14 @@ function Player() {
     const allProgress = JSON.parse(localStorage.getItem(progressKey) || '{}')
     const courseProgress = allProgress[id] || { completedLessons: [], overallComplete: false }
     const lessonId = currentLesson._id
-
     if (!courseProgress.completedLessons.includes(lessonId)) {
       courseProgress.completedLessons.push(lessonId)
     }
-
     const totalLessons = course.lessons.length
     const completedCount = courseProgress.completedLessons.length
     if (completedCount >= totalLessons) {
       courseProgress.overallComplete = true
     }
-
     allProgress[id] = courseProgress
     localStorage.setItem(progressKey, JSON.stringify(allProgress))
     setCourse({ ...course })
@@ -84,23 +81,21 @@ function Player() {
     <div style={{ backgroundColor: '#81A6C6', minHeight: '100vh', padding: '20px' }}>
       <div className="container-fluid">
 
-        {/* Header */}
         <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
           <div>
             <h4 style={{ color: '#F3E3D0', fontWeight: '800', margin: 0 }}>{course.title}</h4>
             <p style={{ color: '#F3E3D0', opacity: 0.8, margin: 0, fontSize: '13px' }}>
-              👨‍🏫 {course.instructor} &nbsp;|&nbsp; 📊 {course.level}
+              {course.instructor} &nbsp;|&nbsp; {course.level}
             </p>
           </div>
           <button
             onClick={() => navigate('/Mycourses')}
             style={{ backgroundColor: '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '8px', padding: '8px 20px', fontWeight: '700', cursor: 'pointer' }}
           >
-            ← Back to My Courses
+            Back to My Courses
           </button>
         </div>
 
-        {/* Overall Progress Bar */}
         <div style={{ backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: '12px', padding: '16px', marginBottom: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ color: '#F3E3D0', fontWeight: '700', fontSize: '14px' }}>Overall Progress</span>
@@ -115,24 +110,19 @@ function Player() {
           </div>
           {isCourseCompleted() && (
             <div style={{ marginTop: '10px', color: '#27ae60', fontWeight: '700', fontSize: '14px' }}>
-              🎉 Course Completed!
+              Course Completed!
             </div>
           )}
         </div>
 
         <div className="row g-3">
-          {/* Video Player */}
           <div className="col-lg-8">
             <div style={{ backgroundColor: '#F3E3D0', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
-
-              {/* Current Lesson Title */}
               {currentLesson && (
                 <h5 style={{ color: '#1a1a2e', fontWeight: '800', marginBottom: '16px' }}>
-                  📹 {currentLesson.title}
+                  {currentLesson.title}
                 </h5>
               )}
-
-              {/* Video */}
               <div style={{ borderRadius: '12px', overflow: 'hidden', marginBottom: '16px' }}>
                 <iframe
                   width="100%"
@@ -145,12 +135,10 @@ function Player() {
                 />
               </div>
 
-              {/* Lesson Actions */}
               {currentLesson && (
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                   {isLessonCompleted(currentLesson._id) ? (
                     <div style={{ backgroundColor: '#d4edda', border: '1px solid #27ae60', borderRadius: '8px', padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span>✅</span>
                       <span style={{ color: '#27ae60', fontWeight: '700', fontSize: '14px' }}>Lesson Completed!</span>
                     </div>
                   ) : (
@@ -158,11 +146,10 @@ function Player() {
                       onClick={handleMarkLessonComplete}
                       style={{ backgroundColor: '#27ae60', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 24px', fontWeight: '700', fontSize: '14px', cursor: 'pointer' }}
                     >
-                      ✅ Mark Lesson Complete
+                      Mark Lesson Complete
                     </button>
                   )}
 
-                  {/* Next Lesson Button */}
                   {currentLessonIndex < course.lessons.length - 1 && (
                     <button
                       onClick={() => {
@@ -172,39 +159,34 @@ function Player() {
                       }}
                       style={{ backgroundColor: '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '8px', padding: '10px 24px', fontWeight: '700', fontSize: '14px', cursor: 'pointer' }}
                     >
-                      Next Lesson →
+                      Next Lesson
                     </button>
                   )}
 
-                  {/* Mark Course Complete */}
                   {!isCourseCompleted() && overallProgress > 0 && (
                     <button
                       onClick={handleMarkCourseComplete}
                       style={{ backgroundColor: '#f5a623', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 24px', fontWeight: '700', fontSize: '14px', cursor: 'pointer' }}
                     >
-                      🏆 Mark Course Complete
+                      Mark Course Complete
                     </button>
                   )}
                 </div>
               )}
 
-              {/* No lessons fallback */}
               {!hasLessons && (
                 <div>
                   {isCourseCompleted() ? (
-                    <div style={{ backgroundColor: '#d4edda', border: '1px solid #27ae60', borderRadius: '10px', padding: '14px 20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ fontSize: '22px' }}>✅</span>
-                      <div>
-                        <div style={{ fontWeight: '700', color: '#27ae60' }}>Course Completed!</div>
-                        <div style={{ fontSize: '13px', color: '#555' }}>Great job! This course is marked as complete.</div>
-                      </div>
+                    <div style={{ backgroundColor: '#d4edda', border: '1px solid #27ae60', borderRadius: '10px', padding: '14px 20px' }}>
+                      <div style={{ fontWeight: '700', color: '#27ae60' }}>Course Completed!</div>
+                      <div style={{ fontSize: '13px', color: '#555' }}>Great job! This course is marked as complete.</div>
                     </div>
                   ) : (
                     <button
                       onClick={handleMarkCourseComplete}
                       style={{ backgroundColor: '#27ae60', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 24px', fontWeight: '700', fontSize: '14px', cursor: 'pointer' }}
                     >
-                      ✅ Mark as Complete
+                      Mark as Complete
                     </button>
                   )}
                 </div>
@@ -212,12 +194,11 @@ function Player() {
             </div>
           </div>
 
-          {/* Lessons Sidebar */}
           {hasLessons && (
             <div className="col-lg-4">
               <div style={{ backgroundColor: '#F3E3D0', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', maxHeight: '600px', overflowY: 'auto' }}>
                 <h5 style={{ color: '#1a1a2e', fontWeight: '800', marginBottom: '16px' }}>
-                  📚 Course Lessons
+                  Course Lessons
                   <span style={{ fontSize: '13px', fontWeight: '500', color: '#666', marginLeft: '8px' }}>
                     ({getProgress().completedLessons?.length || 0}/{course.lessons.length} done)
                   </span>
@@ -257,15 +238,15 @@ function Player() {
                         </p>
                         {lesson.duration && (
                           <p style={{ margin: 0, fontSize: '11px', color: isActive ? '#81A6C6' : '#888' }}>
-                            ⏱ {lesson.duration}
+                            {lesson.duration}
                           </p>
                         )}
                       </div>
                       {completed && !isActive && (
-                        <span style={{ fontSize: '16px' }}>✅</span>
+                        <span style={{ color: '#27ae60', fontWeight: '700', fontSize: '13px' }}>Done</span>
                       )}
                       {isActive && (
-                        <span style={{ fontSize: '16px' }}>▶</span>
+                        <span style={{ color: '#f5a623', fontWeight: '700', fontSize: '13px' }}>Playing</span>
                       )}
                     </div>
                   )
