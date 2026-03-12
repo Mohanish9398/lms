@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { loginUser } from '../Services/API'
+import { Mail, Lock, LogIn, ShieldAlert } from 'lucide-react'
 
 function Login() {
   const navigate = useNavigate()
@@ -17,21 +18,16 @@ function Login() {
       const data = await loginUser(email, password)
       if (data.token && data.user.role === 'user') {
         const storage = rememberMe ? localStorage : sessionStorage
-        storage.setItem('token', data.token)
-        storage.setItem('isLoggedIn', 'true')
-        storage.setItem('userEmail', data.user.email)
-        storage.setItem('userName', data.user.name)
-        storage.setItem('userRole', data.user.role)
-        storage.setItem('userId', data.user.id)
+        storage.setItem('token', data.token); storage.setItem('isLoggedIn', 'true')
+        storage.setItem('userEmail', data.user.email); storage.setItem('userName', data.user.name)
+        storage.setItem('userRole', data.user.role); storage.setItem('userId', data.user.id)
         navigate('/home')
       } else if (data.token && data.user.role === 'admin') {
         setError('Please use the Admin Login page.')
       } else {
         setError(data.message || 'Invalid credentials.')
       }
-    } catch (err) {
-      setError('Server error. Please try again.')
-    }
+    } catch (err) { setError('Server error. Please try again.') }
     setLoading(false)
   }
 
@@ -41,14 +37,14 @@ function Login() {
         <h2 style={{ textAlign: 'center', color: '#1a1a2e', fontWeight: '800', marginBottom: '8px' }}>Welcome Back</h2>
         <p style={{ textAlign: 'center', color: '#666', marginBottom: '30px' }}>Login to continue your learning journey</p>
 
-        {error && <div className="alert alert-danger">{error}</div>}
+        {error && <div className="alert alert-danger" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><ShieldAlert size={16} /> {error}</div>}
 
         <div className="mb-3">
-          <label style={{ fontWeight: '600', color: '#1a1a2e' }}>Email</label>
+          <label style={{ fontWeight: '600', color: '#1a1a2e', display: 'flex', alignItems: 'center', gap: '6px' }}><Mail size={15} /> Email</label>
           <input type="email" className="form-control mt-1" placeholder="Enter your email" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSubmit()} />
         </div>
         <div className="mb-3">
-          <label style={{ fontWeight: '600', color: '#1a1a2e' }}>Password</label>
+          <label style={{ fontWeight: '600', color: '#1a1a2e', display: 'flex', alignItems: 'center', gap: '6px' }}><Lock size={15} /> Password</label>
           <input type="password" className="form-control mt-1" placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSubmit()} />
         </div>
         <div className="mb-4 d-flex justify-content-between align-items-center">
@@ -59,8 +55,8 @@ function Login() {
           <Link to="#" style={{ color: '#81A6C6', fontSize: '14px' }}>Forgot Password?</Link>
         </div>
 
-        <button onClick={handleSubmit} disabled={loading} style={{ width: '100%', padding: '12px', backgroundColor: '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '16px', cursor: 'pointer' }}>
-          {loading ? 'Logging in...' : 'Login'}
+        <button onClick={handleSubmit} disabled={loading} style={{ width: '100%', padding: '12px', backgroundColor: '#1a1a2e', color: '#F3E3D0', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <LogIn size={18} /> {loading ? 'Logging in...' : 'Login'}
         </button>
 
         <p style={{ textAlign: 'center', marginTop: '20px', color: '#666' }}>
@@ -68,8 +64,8 @@ function Login() {
         </p>
 
         <div style={{ textAlign: 'center', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #D2C4B4' }}>
-          <span onClick={() => navigate('/AdminLogin')} style={{ color: '#f5a623', fontWeight: '600', cursor: 'pointer', fontSize: '14px' }}>
-            Admin Login
+          <span onClick={() => navigate('/AdminLogin')} style={{ color: '#f5a623', fontWeight: '600', cursor: 'pointer', fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <ShieldAlert size={15} /> Admin Login
           </span>
         </div>
       </div>
