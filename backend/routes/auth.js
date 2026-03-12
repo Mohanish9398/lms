@@ -5,22 +5,29 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/User')
 const { auth } = require('../middleware/auth')
 
-// Signup
 router.post('/signup', async (req, res) => {
   try {
     const { name, email, password } = req.body
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'All fields are required.' })
+    }
     const existing = await User.findOne({ email })
     if (existing) return res.status(400).json({ message: 'Email already exists' })
     const hashed = await bcrypt.hash(password, 10)
     const user = await User.create({ name, email, password: hashed })
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' })
+    const secret = process.env.JWT_SECRET
+    if (!secret) {
+      await User.findByIdAndDelete(user._id)
+      return res.status(500).json({ message: 'Server configuration error. Please contact support.' })
+    }
+    const token = jwt.sign({ id: user._id, role: user.role }, secret, { expiresIn: '7d' })
     res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } })
   } catch (err) {
+    console.error('Signup error:', err.message)
     res.status(500).json({ message: 'Server error' })
   }
 })
 
-// Login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body
@@ -36,7 +43,6 @@ router.post('/login', async (req, res) => {
   }
 })
 
-// Get all users (admin only)
 router.get('/users', auth, async (req, res) => {
   try {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' })
@@ -47,7 +53,6 @@ router.get('/users', auth, async (req, res) => {
   }
 })
 
-// Get single user (admin only)
 router.get('/users/:id', auth, async (req, res) => {
   try {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' })
@@ -58,7 +63,6 @@ router.get('/users/:id', auth, async (req, res) => {
   }
 })
 
-// Edit user (admin only)
 router.put('/users/:id', auth, async (req, res) => {
   try {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' })
@@ -70,7 +74,6 @@ router.put('/users/:id', auth, async (req, res) => {
   }
 })
 
-// Reset user password (admin only)
 router.put('/users/:id/reset-password', auth, async (req, res) => {
   try {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' })
@@ -83,7 +86,6 @@ router.put('/users/:id/reset-password', auth, async (req, res) => {
   }
 })
 
-// Ban/unban user (admin only)
 router.put('/users/:id/ban', auth, async (req, res) => {
   try {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' })
@@ -96,7 +98,6 @@ router.put('/users/:id/ban', auth, async (req, res) => {
   }
 })
 
-// Delete user (admin only)
 router.delete('/users/:id', auth, async (req, res) => {
   try {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' })
@@ -107,13 +108,10 @@ router.delete('/users/:id', auth, async (req, res) => {
   }
 })
 
-// Unenroll user from course (admin only)
 router.put('/users/:id/unenroll/:courseId', auth, async (req, res) => {
   try {
     if (req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' })
-    await User.findByIdAndUpdate(req.params.id, {
-      $pull: { enrolledCourses: req.params.courseId }
-    })
+    await User.findByIdAndUpdate(req.params.id, { $pull: { enrolledCourses: req.params.courseId } })
     res.json({ message: 'User unenrolled from course' })
   } catch (err) {
     res.status(500).json({ message: 'Server error' })

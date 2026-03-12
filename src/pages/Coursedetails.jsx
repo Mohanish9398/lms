@@ -1,154 +1,118 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { fetchCourse, enrollCourse } from '../Services/API'
-import { User, Clock, BarChart2, Tag, CheckCircle, ArrowLeft, BookOpen, ListChecks, Zap } from 'lucide-react'
+import { User, Clock, BarChart2, Tag, CheckCircle, ArrowLeft, BookOpen, Zap } from 'lucide-react'
 
-const LEVEL_COLORS = {
-  Beginner: { color: 'var(--neon-green)', bg: 'rgba(0,255,136,0.08)', border: 'rgba(0,255,136,0.25)' },
-  Intermediate: { color: 'var(--neon-cyan)', bg: 'rgba(0,245,255,0.08)', border: 'rgba(0,245,255,0.25)' },
-  Advanced: { color: 'var(--neon-pink)', bg: 'rgba(255,0,110,0.08)', border: 'rgba(255,0,110,0.25)' },
-}
-
-function Coursedetails() {
+export default function Coursedetails() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [course, setCourse] = useState(null)
+  const [course, setCourse]   = useState(null)
   const [enrolled, setEnrolled] = useState(false)
   const [loading, setLoading] = useState(false)
-  const userRole = localStorage.getItem('userRole') || sessionStorage.getItem('userRole') || ''
+  const role = localStorage.getItem('userRole') || sessionStorage.getItem('userRole') || ''
 
   useEffect(() => {
-    fetchCourse(id).then(data => setCourse(data))
+    fetchCourse(id).then(d => setCourse(d))
     const token = localStorage.getItem('token') || sessionStorage.getItem('token')
     if (token) {
-      fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/courses/enrolled/my`, { headers: { Authorization: `Bearer ${token}` } })
-        .then(res => res.json()).then(data => { if (Array.isArray(data)) setEnrolled(data.some(c => c._id === id)) })
+      fetch(`${process.env.REACT_APP_API_URL||'http://localhost:5000'}/api/courses/enrolled/my`, { headers:{Authorization:`Bearer ${token}`} })
+        .then(r=>r.json()).then(d=>{ if(Array.isArray(d)) setEnrolled(d.some(c=>c._id===id)) })
     }
   }, [id])
 
   const handleEnroll = async () => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token')
-    if (!token) { alert('Please login first to enroll in a course.'); navigate('/Login'); return }
+    if (!token) { alert('Please login first.'); navigate('/Login'); return }
     setLoading(true)
     const data = await enrollCourse(id)
-    if (data.message === 'Enrolled successfully') { setEnrolled(true); navigate('/Mycourses') }
+    if (data.message==='Enrolled successfully') { setEnrolled(true); navigate('/Mycourses') }
     else alert(data.message)
     setLoading(false)
   }
 
   if (!course) return (
-    <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ fontFamily: 'var(--font-mono)', color: 'var(--neon-cyan)', fontSize: '14px', letterSpacing: '2px' }}>Loading...</div>
+    <div style={{ background:'var(--bg-0)', minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', color:'var(--t-lo)', fontSize:13, fontFamily:'var(--font-mono)' }}>
+      Loading…
     </div>
   )
 
-  const level = LEVEL_COLORS[course.level] || LEVEL_COLORS.Beginner
+  const lvlBadge = { Beginner:'badge-green', Intermediate:'badge-teal', Advanced:'badge-red' }
+
+  const Meta = ({ icon, label, value }) => (
+    <div style={{ display:'flex', alignItems:'center', gap:9, padding:'11px 14px', background:'var(--bg-3)', border:'1px solid var(--b-1)', borderRadius:'var(--r-md)' }}>
+      <span style={{ color:'var(--accent)' }}>{icon}</span>
+      <div>
+        <div style={{ fontSize:10, fontFamily:'var(--font-mono)', color:'var(--t-lo)', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:1 }}>{label}</div>
+        <div style={{ fontSize:13, fontWeight:600, color:'var(--t-hi)' }}>{value}</div>
+      </div>
+    </div>
+  )
 
   return (
-    <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', padding: '40px 20px' }}>
-      <div className="container">
-        <div style={{
-          background: 'var(--bg-card)', borderRadius: '16px', padding: '40px',
-          border: '1px solid var(--border-neon)',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 30px rgba(0,245,255,0.04)',
-          position: 'relative', overflow: 'hidden'
-        }}>
-          {/* Top glow */}
-          <div style={{ position: 'absolute', top: 0, left: '10%', right: '10%', height: '1px', background: 'var(--gradient-neon)', opacity: 0.4 }} />
-          {/* Corner decoration */}
-          <div style={{ position: 'absolute', top: 0, right: 0, width: '200px', height: '200px', background: 'radial-gradient(circle at top right, rgba(0,245,255,0.06), transparent 70%)', pointerEvents: 'none' }} />
+    <div style={{ background:'var(--bg-0)', minHeight:'100vh', padding:'44px 20px' }}>
+      <div style={{ maxWidth:960, margin:'0 auto' }}>
+        <button onClick={() => navigate('/home')} className="btn-ghost" style={{ marginBottom:24, color:'var(--t-lo)', fontSize:12 }}>
+          <ArrowLeft size={13}/> Back to courses
+        </button>
 
-          <div className="row">
-            <div className="col-md-4 text-center mb-4 mb-md-0">
-              <div style={{
-                background: 'linear-gradient(135deg, rgba(0,245,255,0.05), rgba(191,0,255,0.05))',
-                borderRadius: '12px', padding: '30px', border: '1px solid var(--border-subtle)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', height: '200px'
-              }}>
-                <img src={course.image} alt={course.title} style={{ maxHeight: '150px', maxWidth: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 12px rgba(0,245,255,0.3))' }} />
-              </div>
+        <div style={{ background:'var(--bg-2)', border:'1px solid var(--b-1)', borderRadius:'var(--r-xl)', overflow:'hidden' }}>
+          
+          <div style={{ background:'var(--bg-3)', borderBottom:'1px solid var(--b-1)', padding:'32px', display:'flex', gap:28, alignItems:'flex-start', flexWrap:'wrap' }}>
+            <div style={{ width:100, height:100, borderRadius:14, background:'var(--bg-1)', border:'1px solid var(--b-1)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <img src={course.image} alt={course.title} style={{ maxWidth:70, maxHeight:70, objectFit:'contain', filter:'drop-shadow(0 2px 8px rgba(0,0,0,0.5))' }}/>
+            </div>
+            <div style={{ flex:1, minWidth:200 }}>
+              <span className={`badge ${lvlBadge[course.level]||'badge-muted'}`} style={{ marginBottom:10 }}>{course.level}</span>
+              <h1 style={{ fontFamily:'var(--font-display)', fontSize:'clamp(20px,3vw,28px)', fontWeight:800, letterSpacing:'-0.03em', marginBottom:8 }}>{course.title}</h1>
+              <p style={{ fontSize:14, color:'var(--t-mid)', lineHeight:1.65 }}>{course.description}</p>
+            </div>
+          </div>
+
+          <div style={{ padding:'28px 32px' }}>
+            
+            <div className="row g-2" style={{ marginBottom:24 }}>
+              <div className="col-6 col-md-3"><Meta icon={<User size={14}/>}     label="Instructor" value={course.instructor}/></div>
+              <div className="col-6 col-md-3"><Meta icon={<Clock size={14}/>}    label="Duration"   value={course.duration}/></div>
+              <div className="col-6 col-md-3"><Meta icon={<BarChart2 size={14}/>}label="Level"      value={course.level}/></div>
+              <div className="col-6 col-md-3"><Meta icon={<Tag size={14}/>}      label="Price"      value={course.price}/></div>
             </div>
 
-            <div className="col-md-8">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-                <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase', padding: '3px 10px', borderRadius: '4px', background: level.bg, color: level.color, border: `1px solid ${level.border}` }}>
-                  {course.level}
-                </span>
-                <span style={{ fontSize: '10px', fontFamily: 'var(--font-mono)', color: 'var(--neon-green)', background: 'rgba(0,255,136,0.08)', border: '1px solid rgba(0,255,136,0.2)', padding: '3px 10px', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                  {course.price}
-                </span>
-              </div>
-
-              <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '12px', fontSize: 'clamp(20px, 3vw, 28px)' }}>{course.title}</h2>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: '20px', lineHeight: 1.7, fontSize: '14px' }}>{course.description}</p>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', marginBottom: '20px' }}>
-                {[
-                  { icon: <User size={13} color="var(--neon-cyan)"/>, label: 'Instructor', val: course.instructor },
-                  { icon: <Clock size={13} color="var(--neon-purple)"/>, label: 'Duration', val: course.duration },
-                  { icon: <BarChart2 size={13} color={level.color}/>, label: 'Level', val: course.level },
-                ].map(item => (
-                  <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '10px 14px', border: '1px solid var(--border-subtle)' }}>
-                    {item.icon}
-                    <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginRight: '4px' }}>{item.label}:</span>
-                    <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontFamily: 'var(--font-display)', fontWeight: '600' }}>{item.val}</span>
-                  </div>
-                ))}
-              </div>
-
-              {course.topics && course.topics.length > 0 && (
-                <div style={{ marginBottom: '24px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--neon-cyan)', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-                    <ListChecks size={13}/> Topics Covered
-                  </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {course.topics.map((t, i) => (
-                      <span key={i} style={{ fontSize: '11px', fontFamily: 'var(--font-body)', color: 'var(--text-secondary)', background: 'rgba(0,245,255,0.05)', border: '1px solid var(--border-subtle)', borderRadius: '4px', padding: '4px 10px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Zap size={9} color="var(--neon-cyan)"/> {t}
-                      </span>
-                    ))}
-                  </div>
+            
+            {course.topics?.length > 0 && (
+              <div style={{ marginBottom:28 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:14 }}>
+                  <BookOpen size={14} color="var(--accent)"/>
+                  <span style={{ fontSize:12, fontFamily:'var(--font-mono)', color:'var(--t-mid)', textTransform:'uppercase', letterSpacing:'0.06em', fontWeight:600 }}>Topics covered</span>
                 </div>
-              )}
+                <div className="row g-2">
+                  {course.topics.map((t,i) => (
+                    <div key={i} className="col-md-6">
+                      <div style={{ display:'flex', alignItems:'center', gap:8, padding:'9px 12px', background:'var(--bg-3)', border:'1px solid var(--b-1)', borderRadius:'var(--r-md)', fontSize:13, color:'var(--t-mid)' }}>
+                        <Zap size={11} color="var(--accent)"/>{t}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                {userRole !== 'admin' && (
-                  <button onClick={handleEnroll} disabled={enrolled || loading} style={{
-                    padding: '11px 28px',
-                    background: enrolled ? 'rgba(0,255,136,0.1)' : loading ? 'rgba(0,245,255,0.2)' : 'var(--gradient-neon)',
-                    border: enrolled ? '1px solid rgba(0,255,136,0.3)' : 'none',
-                    borderRadius: '8px', fontFamily: 'var(--font-display)',
-                    fontWeight: '700', fontSize: '13px', letterSpacing: '1px',
-                    textTransform: 'uppercase', color: enrolled ? 'var(--neon-green)' : '#000',
-                    cursor: enrolled ? 'not-allowed' : 'pointer',
-                    display: 'flex', alignItems: 'center', gap: '8px',
-                    boxShadow: enrolled ? 'none' : '0 0 20px rgba(0,245,255,0.25)',
-                    transition: 'var(--transition)'
-                  }}>
-                    {enrolled ? <><CheckCircle size={14}/> Enrolled</> : loading ? 'Enrolling...' : <><BookOpen size={14}/> Enroll Now</>}
+            
+            {role !== 'admin' && (
+              <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+                {enrolled ? (
+                  <div style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 18px', background:'rgba(52,211,153,0.07)', border:'1px solid rgba(52,211,153,0.16)', borderRadius:'var(--r-md)', fontSize:13, color:'#6ee7b7', fontWeight:500 }}>
+                    <CheckCircle size={14}/> Already enrolled
+                  </div>
+                ) : (
+                  <button onClick={handleEnroll} disabled={loading} className="btn-accent" style={{ padding:'10px 22px' }}>
+                    <BookOpen size={14}/> {loading ? 'Enrolling…' : 'Enroll now — free'}
                   </button>
                 )}
-                <button onClick={() => navigate('/home')} style={{
-                  padding: '11px 24px',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid var(--border-neon)', borderRadius: '8px',
-                  fontFamily: 'var(--font-display)', fontWeight: '600',
-                  fontSize: '13px', letterSpacing: '1px', textTransform: 'uppercase',
-                  color: 'var(--text-secondary)', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', gap: '8px',
-                  transition: 'var(--transition)'
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.color = 'var(--neon-cyan)'; e.currentTarget.style.borderColor = 'var(--neon-cyan)' }}
-                  onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.borderColor = 'var(--border-neon)' }}>
-                  <ArrowLeft size={14}/> Back
-                </button>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   )
 }
-
-export default Coursedetails

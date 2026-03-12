@@ -1,26 +1,26 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { loginUser } from '../Services/API'
-import { Mail, Lock, LogIn, ShieldAlert, Zap } from 'lucide-react'
+import { Mail, Lock, LogIn, AlertCircle, ShieldAlert } from 'lucide-react'
 
-function Login() {
+export default function Login() {
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [rememberMe, setRememberMe] = useState(false)
-  const [error, setError] = useState('')
+  const [email, setEmail]     = useState('')
+  const [pass, setPass]       = useState('')
+  const [remember, setRemember] = useState(false)
+  const [error, setError]     = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async () => {
-    if (!email || !password) { setError('Please enter both email and password.'); return }
-    setLoading(true)
+  const submit = async () => {
+    if (!email || !pass) { setError('Please enter both email and password.'); return }
+    setLoading(true); setError('')
     try {
-      const data = await loginUser(email, password)
+      const data = await loginUser(email, pass)
       if (data.token && data.user.role === 'user') {
-        const storage = rememberMe ? localStorage : sessionStorage
-        storage.setItem('token', data.token); storage.setItem('isLoggedIn', 'true')
-        storage.setItem('userEmail', data.user.email); storage.setItem('userName', data.user.name)
-        storage.setItem('userRole', data.user.role); storage.setItem('userId', data.user.id)
+        const s = remember ? localStorage : sessionStorage
+        s.setItem('token', data.token); s.setItem('isLoggedIn','true')
+        s.setItem('userEmail', data.user.email); s.setItem('userName', data.user.name)
+        s.setItem('userRole', data.user.role); s.setItem('userId', data.user.id)
         navigate('/home')
       } else if (data.token && data.user.role === 'admin') {
         setError('Please use the Admin Login page.')
@@ -32,107 +32,77 @@ function Login() {
   }
 
   return (
-    <div style={{
-      background: 'var(--bg-primary)', minHeight: '100vh',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '40px 20px', position: 'relative', overflow: 'hidden'
-    }}>
-      {/* Background */}
-      <div style={{ position: 'absolute', width: '500px', height: '500px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,245,255,0.06) 0%, transparent 70%)', top: '-100px', left: '-100px', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(191,0,255,0.06) 0%, transparent 70%)', bottom: '-100px', right: '-100px', pointerEvents: 'none' }} />
+    <div style={{ background:'var(--bg-0)', minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'40px 16px' }}>
+      <div style={{ width:'100%', maxWidth:400 }}>
 
-      <div style={{
-        background: 'var(--bg-card)', borderRadius: '16px', padding: '40px',
-        width: '100%', maxWidth: '440px', position: 'relative',
-        border: '1px solid var(--border-neon)',
-        boxShadow: '0 30px 80px rgba(0,0,0,0.8), 0 0 40px rgba(0,245,255,0.06)'
-      }}>
-        {/* Top glow */}
-        <div style={{ position: 'absolute', top: 0, left: '20%', right: '20%', height: '1px', background: 'var(--gradient-neon)', opacity: 0.6 }} />
-
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{
-            width: '56px', height: '56px', borderRadius: '14px',
-            background: 'var(--gradient-neon)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px',
-            boxShadow: '0 0 25px rgba(0,245,255,0.4)'
-          }}>
-            <Zap size={26} color="#000" fill="#000" />
+        
+        <div style={{ textAlign:'center', marginBottom:32 }}>
+          <div style={{ width:44, height:44, borderRadius:11, background:'var(--accent-soft)', border:'1px solid var(--accent-border)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px', boxShadow:'0 0 24px rgba(6,255,210,0.12)' }}>
+            <LogIn size={20} color="var(--accent)"/>
           </div>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: '900', fontSize: '26px', color: 'var(--text-primary)', marginBottom: '6px', letterSpacing: '1px' }}>Welcome Back</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '13px', fontFamily: 'var(--font-body)' }}>Login to continue your learning journey</p>
+          <h2 style={{ fontSize:22, fontWeight:800, letterSpacing:'-0.03em', marginBottom:6 }}>Welcome back</h2>
+          <p style={{ fontSize:13, color:'var(--t-mid)' }}>Sign in to continue your learning journey</p>
         </div>
 
-        {error && (
-          <div style={{ background: 'rgba(255,0,110,0.08)', border: '1px solid rgba(255,0,110,0.25)', borderRadius: '8px', padding: '11px 14px', marginBottom: '20px', color: '#ff6699', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-body)' }}>
-            <ShieldAlert size={14}/> {error}
+        
+        <div style={{ background:'var(--bg-2)', border:'1px solid var(--b-1)', borderRadius:'var(--r-xl)', padding:'28px 28px 24px', boxShadow:'0 20px 60px rgba(0,0,0,0.4)' }}>
+          {error && (
+            <div style={{ display:'flex', alignItems:'center', gap:8, background:'rgba(248,113,113,0.07)', border:'1px solid rgba(248,113,113,0.16)', borderRadius:'var(--r-md)', padding:'10px 13px', marginBottom:18, fontSize:13, color:'#fca5a5' }}>
+              <AlertCircle size={14} style={{ flexShrink:0 }}/> {error}
+            </div>
+          )}
+
+          <div style={{ marginBottom:16 }}>
+            <label>Email address</label>
+            <div style={{ position:'relative' }}>
+              <Mail size={14} color="var(--t-lo)" style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', pointerEvents:'none' }}/>
+              <input type="email" style={{ width:'100%', background:'var(--bg-3)', border:'1px solid var(--b-1)', borderRadius:'var(--r-md)', padding:'9px 12px 9px 36px', color:'var(--t-hi)', fontSize:13, fontFamily:'var(--font-body)', outline:'none', boxSizing:'border-box' }} placeholder="you@example.com" value={email}
+                onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()}/>
+            </div>
           </div>
-        )}
 
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px', fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-            <Mail size={11} color="var(--neon-cyan)" /> Email
-          </label>
-          <input type="email" className="form-control" placeholder="your@email.com"
-            value={email} onChange={e => setEmail(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSubmit()} />
-        </div>
-
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px', fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-            <Lock size={11} color="var(--neon-cyan)" /> Password
-          </label>
-          <input type="password" className="form-control" placeholder="••••••••"
-            value={password} onChange={e => setPassword(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSubmit()} />
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <div className="form-check" style={{ margin: 0 }}>
-            <input className="form-check-input" type="checkbox" id="rememberMe" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} />
-            <label className="form-check-label" htmlFor="rememberMe" style={{ fontSize: '13px', color: 'var(--text-muted)', fontFamily: 'var(--font-body)', textTransform: 'none', letterSpacing: 0 }}>Remember Me</label>
+          <div style={{ marginBottom:18 }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:7 }}>
+              <label style={{ margin:0 }}>Password</label>
+              <Link to="#" style={{ fontSize:11, color:'var(--t-lo)', fontFamily:'var(--font-mono)', transition:'color 0.15s' }}
+                onMouseEnter={e=>e.currentTarget.style.color='var(--accent)'}
+                onMouseLeave={e=>e.currentTarget.style.color='var(--t-lo)'}>Forgot?</Link>
+            </div>
+            <div style={{ position:'relative' }}>
+              <Lock size={14} color="var(--t-lo)" style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', pointerEvents:'none' }}/>
+              <input type="password" style={{ width:'100%', background:'var(--bg-3)', border:'1px solid var(--b-1)', borderRadius:'var(--r-md)', padding:'9px 12px 9px 36px', color:'var(--t-hi)', fontSize:13, fontFamily:'var(--font-body)', outline:'none', boxSizing:'border-box' }} placeholder="Enter your password" value={pass}
+                onChange={e=>setPass(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()}/>
+            </div>
           </div>
-          <Link to="#" style={{ color: 'var(--neon-cyan)', fontSize: '12px', textDecoration: 'none', fontFamily: 'var(--font-mono)' }}>Forgot password?</Link>
+
+          <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:22 }}>
+            <input type="checkbox" className="form-check-input" id="rem" checked={remember} onChange={e=>setRemember(e.target.checked)} style={{ margin:0 }}/>
+            <label htmlFor="rem" style={{ margin:0, fontSize:12, color:'var(--t-mid)', textTransform:'none', letterSpacing:'normal', cursor:'pointer' }}>Remember me</label>
+          </div>
+
+          <button onClick={submit} disabled={loading} className="btn-accent" style={{ width:'100%', justifyContent:'center', padding:'11px' }}>
+            <LogIn size={15}/> {loading ? 'Signing in…' : 'Sign in'}
+          </button>
+
+          <div style={{ textAlign:'center', marginTop:18 }}>
+            <span style={{ fontSize:13, color:'var(--t-lo)' }}>
+              No account?{' '}
+              <Link to="/Signup" style={{ color:'var(--accent)', fontWeight:600, transition:'opacity 0.15s' }}
+                onMouseEnter={e=>e.currentTarget.style.opacity='0.8'}
+                onMouseLeave={e=>e.currentTarget.style.opacity='1'}>Sign up free</Link>
+            </span>
+          </div>
         </div>
 
-        <button onClick={handleSubmit} disabled={loading} style={{
-          width: '100%', padding: '13px',
-          background: loading ? 'rgba(0,245,255,0.3)' : 'var(--gradient-neon)',
-          border: 'none', borderRadius: '8px',
-          fontFamily: 'var(--font-display)', fontWeight: '700', fontSize: '14px',
-          letterSpacing: '1.5px', textTransform: 'uppercase',
-          color: '#000', cursor: loading ? 'not-allowed' : 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-          boxShadow: '0 0 20px rgba(0,245,255,0.25)', transition: 'var(--transition)'
-        }}
-          onMouseEnter={e => !loading && (e.currentTarget.style.boxShadow = '0 0 35px rgba(0,245,255,0.5)')}
-          onMouseLeave={e => !loading && (e.currentTarget.style.boxShadow = '0 0 20px rgba(0,245,255,0.25)')}>
-          <LogIn size={16} /> {loading ? 'Logging In...' : 'Login'}
-        </button>
-
-        <p style={{ textAlign: 'center', marginTop: '20px', color: 'var(--text-muted)', fontSize: '13px', fontFamily: 'var(--font-body)' }}>
-          Don't have an account?{' '}
-          <Link to="/Signup" style={{ color: 'var(--neon-cyan)', fontWeight: '600', textDecoration: 'none' }}>Sign Up</Link>
-        </p>
-
-        <div style={{ textAlign: 'center', marginTop: '14px', paddingTop: '14px', borderTop: '1px solid var(--border-subtle)' }}>
-          <span onClick={() => navigate('/AdminLogin')} style={{
-            color: 'var(--neon-orange)', fontFamily: 'var(--font-mono)',
-            fontWeight: '600', cursor: 'pointer', fontSize: '11px',
-            letterSpacing: '1px', textTransform: 'uppercase',
-            display: 'inline-flex', alignItems: 'center', gap: '6px',
-            transition: 'var(--transition)'
-          }}
-            onMouseEnter={e => e.currentTarget.style.textShadow = '0 0 10px rgba(255,123,0,0.8)'}
-            onMouseLeave={e => e.currentTarget.style.textShadow = 'none'}>
-            <ShieldAlert size={12}/> Admin Login
+        
+        <div style={{ textAlign:'center', marginTop:18 }}>
+          <span onClick={() => navigate('/AdminLogin')} style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:12, color:'var(--t-lo)', fontFamily:'var(--font-mono)', cursor:'pointer', transition:'color 0.15s' }}
+            onMouseEnter={e=>e.currentTarget.style.color='var(--orange)'}
+            onMouseLeave={e=>e.currentTarget.style.color='var(--t-lo)'}>
+            <ShieldAlert size={12}/> Admin login
           </span>
         </div>
       </div>
     </div>
   )
 }
-
-export default Login

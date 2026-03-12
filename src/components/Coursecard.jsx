@@ -1,83 +1,43 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User, Clock, BarChart2 } from 'lucide-react'
+import { Clock, User } from 'lucide-react'
 
-const LEVEL_COLORS = {
-  Beginner: { color: 'var(--neon-green)', bg: 'rgba(0,255,136,0.08)', border: 'rgba(0,255,136,0.25)' },
-  Intermediate: { color: 'var(--neon-cyan)', bg: 'rgba(0,245,255,0.08)', border: 'rgba(0,245,255,0.25)' },
-  Advanced: { color: 'var(--neon-pink)', bg: 'rgba(255,0,110,0.08)', border: 'rgba(255,0,110,0.25)' },
+const levelBadge = {
+  Beginner:     'badge-green',
+  Intermediate: 'badge-teal',
+  Advanced:     'badge-red',
 }
 
-function Coursecard({ course }) {
+export default function Coursecard({ course }) {
   const navigate = useNavigate()
-  const level = LEVEL_COLORS[course.level] || LEVEL_COLORS.Beginner
+  const badgeCls = levelBadge[course.level] || 'badge-muted'
 
   return (
-    <div
-      onClick={() => navigate(`/Coursedetails/${course._id}`)}
-      className="course-card"
-      style={{
-        background: 'var(--bg-card)',
-        borderRadius: '14px', overflow: 'hidden',
-        border: '1px solid var(--border-neon)',
-        cursor: 'pointer', height: '100%',
-        position: 'relative'
-      }}
-    >
-      {/* Top image area */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(0,245,255,0.04), rgba(191,0,255,0.04))',
-        padding: '24px 20px 20px',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        height: '140px', position: 'relative',
-        borderBottom: '1px solid var(--border-subtle)'
-      }}>
-        {/* Corner decoration */}
-        <div style={{
-          position: 'absolute', top: 0, right: 0, width: '60px', height: '60px',
-          background: 'radial-gradient(circle at top right, rgba(0,245,255,0.12), transparent 70%)'
-        }} />
-        <img
-          src={course.image} alt={course.title}
-          style={{ maxHeight: '90px', maxWidth: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(0,245,255,0.2))' }}
-        />
+    <div className="card card-hover" onClick={() => navigate(`/Coursedetails/${course._id}`)}
+      style={{ height:'100%', display:'flex', flexDirection:'column', overflow:'hidden' }}>
+
+      
+      <div style={{ background:'var(--bg-3)', borderBottom:'1px solid var(--b-1)', height:120, display:'flex', alignItems:'center', justifyContent:'center', padding:'16px', position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at 80% 20%, rgba(6,255,210,0.04) 0%, transparent 60%)', pointerEvents:'none' }}/>
+        <img src={course.image} alt={course.title}
+          style={{ maxHeight:76, maxWidth:'80%', objectFit:'contain', filter:'drop-shadow(0 2px 10px rgba(0,0,0,0.5))', position:'relative' }}/>
       </div>
 
-      <div style={{ padding: '16px' }}>
-        <h6 style={{
-          fontFamily: 'var(--font-display)', fontWeight: '700',
-          color: 'var(--text-primary)', marginBottom: '10px', fontSize: '14px',
-          lineHeight: 1.3
-        }}>{course.title}</h6>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '12px' }}>
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: 0, display: 'flex', alignItems: 'center', gap: '5px', fontFamily: 'var(--font-body)' }}>
-            <User size={11} color="var(--neon-cyan)" /> {course.instructor}
-          </p>
-          <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0, display: 'flex', alignItems: 'center', gap: '5px', fontFamily: 'var(--font-mono)' }}>
-            <Clock size={10} color="var(--text-muted)" /> {course.duration}
-          </p>
+      
+      <div style={{ padding:'14px 16px', display:'flex', flexDirection:'column', gap:7, flex:1 }}>
+        <span className={`badge ${badgeCls}`}>{course.level}</span>
+        <h6 style={{ fontFamily:'var(--font-display)', fontSize:14, fontWeight:600, color:'var(--t-hi)', lineHeight:1.35 }}>
+          {course.title}
+        </h6>
+        <div style={{ marginTop:'auto', display:'flex', flexDirection:'column', gap:4 }}>
+          <span style={{ fontFamily:'var(--font-body)', fontSize:12, color:'var(--t-lo)', display:'flex', alignItems:'center', gap:5 }}>
+            <User size={11}/>{course.instructor}
+          </span>
+          <span style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--t-lo)', display:'flex', alignItems:'center', gap:5 }}>
+            <Clock size={11}/>{course.duration}
+          </span>
         </div>
-
-        <span style={{
-          fontSize: '10px', fontFamily: 'var(--font-mono)', fontWeight: '700',
-          letterSpacing: '1px', textTransform: 'uppercase',
-          padding: '3px 9px', borderRadius: '4px',
-          background: level.bg, color: level.color, border: `1px solid ${level.border}`,
-          display: 'inline-flex', alignItems: 'center', gap: '4px'
-        }}>
-          <BarChart2 size={9} /> {course.level}
-        </span>
       </div>
-
-      {/* Bottom glow line on hover */}
-      <div style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px',
-        background: 'var(--gradient-neon)', opacity: 0,
-        transition: 'opacity 0.3s'
-      }} className="card-glow-line" />
     </div>
   )
 }
-
-export default Coursecard

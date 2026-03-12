@@ -3,156 +3,115 @@ import { Link, useNavigate } from 'react-router-dom'
 import { fetchMyCourses, unenrollCourse } from '../Services/API'
 import { BookOpen, Clock, PlayCircle, RotateCcw, Trophy, Flame, UserMinus } from 'lucide-react'
 
-function Mycourses() {
-  const [enrolledCourses, setEnrolledCourses] = useState([])
+export default function Mycourses() {
+  const [courses, setCourses] = useState([])
   const navigate = useNavigate()
-  const userEmail = localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail') || ''
-  const progressKey = `courseProgress_${userEmail}`
+  const email = localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail') || ''
+  const progKey = `courseProgress_${email}`
 
   useEffect(() => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token')
     if (!token) { navigate('/Login'); return }
-    fetchMyCourses().then(data => { if (Array.isArray(data)) setEnrolledCourses(data) })
+    fetchMyCourses().then(d => { if (Array.isArray(d)) setCourses(d) })
   }, [navigate])
 
-  const getProgress = (courseId) => {
-    const allProgress = JSON.parse(localStorage.getItem(progressKey) || '{}')
-    const p = allProgress[courseId]
+  const getProgress = id => {
+    const all = JSON.parse(localStorage.getItem(progKey) || '{}')
+    const p = all[id]
     if (!p) return 0
     if (p.overallComplete) return 100
     if (p.completedLessons?.length > 0) return 50
     return 0
   }
 
-  const handleUnenroll = async (courseId) => {
-    await unenrollCourse(courseId)
-    setEnrolledCourses(prev => prev.filter(c => c._id !== courseId))
-    const allProgress = JSON.parse(localStorage.getItem(progressKey) || '{}')
-    delete allProgress[courseId]
-    localStorage.setItem(progressKey, JSON.stringify(allProgress))
+  const unenroll = async id => {
+    await unenrollCourse(id)
+    setCourses(prev => prev.filter(c => c._id !== id))
+    const all = JSON.parse(localStorage.getItem(progKey) || '{}')
+    delete all[id]; localStorage.setItem(progKey, JSON.stringify(all))
   }
 
-  const getProgressColor = (v) => v === 100 ? 'var(--neon-green)' : v >= 50 ? 'var(--neon-orange)' : 'var(--neon-cyan)'
-  const getStatusLabel = (v) => v === 100 ? { text: 'Completed', icon: <Trophy size={12}/> } : v >= 50 ? { text: 'In Progress', icon: <Flame size={12}/> } : { text: 'Not Started', icon: <BookOpen size={12}/> }
+  const progColor = v => v === 100 ? 'var(--green)' : v >= 50 ? 'var(--orange)' : 'var(--accent)'
+  const progLabel = v => v === 100 ? {text:'Completed',icon:<Trophy size={12}/>} : v >= 50 ? {text:'In Progress',icon:<Flame size={12}/>} : {text:'Not Started',icon:<BookOpen size={12}/>}
 
-  const completed = enrolledCourses.filter(c => getProgress(c._id) === 100).length
-  const inProgress = enrolledCourses.filter(c => getProgress(c._id) === 50).length
-  const notStarted = enrolledCourses.filter(c => getProgress(c._id) === 0).length
+  const stats = [
+    { val: courses.length,                                     label: 'Enrolled' },
+    { val: courses.filter(c=>getProgress(c._id)===100).length, label: 'Completed' },
+    { val: courses.filter(c=>getProgress(c._id)===50).length,  label: 'In Progress' },
+    { val: courses.filter(c=>getProgress(c._id)===0).length,   label: 'Not Started' },
+  ]
 
   return (
-    <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', padding: '40px 20px' }}>
-      <div className="container">
-        <div style={{ textAlign: 'center', marginBottom: '36px' }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--neon-cyan)', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '12px' }}>// My Learning</div>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: '900', fontSize: 'clamp(26px, 4vw, 38px)', color: 'var(--text-primary)', marginBottom: '8px' }}>
-            My <span style={{ background: 'var(--gradient-neon)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Courses</span>
-          </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Track your learning progress</p>
+    <div style={{ background:'var(--bg-0)', minHeight:'100vh', padding:'44px 20px' }}>
+      <div style={{ maxWidth:1100, margin:'0 auto' }}>
+
+        <div style={{ marginBottom:28 }}>
+          <div className="eyebrow" style={{ marginBottom:8 }}>Learning</div>
+          <h1 style={{ fontFamily:'var(--font-display)', fontSize:'clamp(22px,4vw,32px)', fontWeight:800, letterSpacing:'-0.03em' }}>My Courses</h1>
         </div>
 
-        {enrolledCourses.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-            <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'rgba(0,245,255,0.06)', border: '1px solid var(--border-neon)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-              <BookOpen size={28} color="var(--neon-cyan)" />
-            </div>
-            <p style={{ fontFamily: 'var(--font-display)', fontSize: '18px', color: 'var(--text-secondary)', marginBottom: '20px' }}>You haven't enrolled in any courses yet.</p>
-            <Link to="/home" style={{
-              display: 'inline-flex', alignItems: 'center', gap: '8px',
-              background: 'var(--gradient-neon)', border: 'none', borderRadius: '8px',
-              padding: '11px 28px', color: '#000',
-              fontFamily: 'var(--font-display)', fontWeight: '700', fontSize: '13px',
-              letterSpacing: '1px', textTransform: 'uppercase', textDecoration: 'none',
-              boxShadow: '0 0 20px rgba(0,245,255,0.25)'
-            }}>Browse Courses</Link>
+        {courses.length === 0 ? (
+          <div style={{ textAlign:'center', padding:'80px 20px', color:'var(--t-lo)' }}>
+            <BookOpen size={40} style={{ margin:'0 auto 14px', opacity:0.25 }}/>
+            <p style={{ fontSize:14, marginBottom:20 }}>You haven't enrolled in any courses yet.</p>
+            <Link to="/home" className="btn-accent" style={{ textDecoration:'none', padding:'10px 22px' }}>Browse courses</Link>
           </div>
         ) : (
           <>
-            {/* Stats */}
-            <div style={{
-              background: 'var(--bg-card)', borderRadius: '14px', padding: '20px 28px',
-              marginBottom: '30px', border: '1px solid var(--border-neon)',
-              display: 'flex', gap: '40px', justifyContent: 'center', flexWrap: 'wrap'
-            }}>
-              {[
-                { count: enrolledCourses.length, label: 'Enrolled', color: 'var(--neon-cyan)', icon: <BookOpen size={16}/> },
-                { count: completed, label: 'Completed', color: 'var(--neon-green)', icon: <Trophy size={16}/> },
-                { count: inProgress, label: 'In Progress', color: 'var(--neon-orange)', icon: <Flame size={16}/> },
-                { count: notStarted, label: 'Not Started', color: 'var(--text-muted)', icon: <BookOpen size={16}/> },
-              ].map(({ count, label, color, icon }) => (
-                <div key={label} style={{ textAlign: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color, marginBottom: '2px' }}>
-                    {icon}
-                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '26px', fontWeight: '900', textShadow: `0 0 15px ${color}` }}>{count}</span>
-                  </div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '1px', textTransform: 'uppercase' }}>{label}</div>
+            
+            <div style={{ display:'flex', gap:1, background:'var(--b-1)', borderRadius:'var(--r-lg)', overflow:'hidden', marginBottom:28, border:'1px solid var(--b-1)' }}>
+              {stats.map((s,i) => (
+                <div key={s.label} style={{ flex:1, padding:'16px 14px', background:'var(--bg-2)', textAlign:'center', borderRight: i<stats.length-1 ? '1px solid var(--b-1)' : 'none' }}>
+                  <div style={{ fontFamily:'var(--font-display)', fontSize:24, fontWeight:800, color:'var(--t-hi)', letterSpacing:'-0.03em', lineHeight:1 }}>{s.val}</div>
+                  <div style={{ fontSize:11, color:'var(--t-lo)', fontFamily:'var(--font-mono)', marginTop:4, textTransform:'uppercase', letterSpacing:'0.06em' }}>{s.label}</div>
                 </div>
               ))}
             </div>
 
-            <div className="row g-4">
-              {enrolledCourses.map(course => {
-                const progress = getProgress(course._id)
-                const label = getStatusLabel(progress)
-                const pColor = getProgressColor(progress)
+            
+            <div className="row g-3">
+              {courses.map(c => {
+                const prog = getProgress(c._id)
+                const lbl  = progLabel(prog)
+                const col  = progColor(prog)
                 return (
-                  <div className="col-md-4" key={course._id}>
-                    <div style={{
-                      background: 'var(--bg-card)', borderRadius: '14px', overflow: 'hidden',
-                      border: '1px solid var(--border-neon)',
-                      boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
-                      height: '100%', display: 'flex', flexDirection: 'column',
-                      transition: 'var(--transition-slow)'
-                    }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(0,245,255,0.3)'; e.currentTarget.style.transform = 'translateY(-5px)' }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-neon)'; e.currentTarget.style.transform = 'translateY(0)' }}>
+                  <div className="col-md-4" key={c._id}>
+                    <div style={{ background:'var(--bg-2)', border:'1px solid var(--b-1)', borderRadius:'var(--r-lg)', overflow:'hidden', height:'100%', display:'flex', flexDirection:'column', transition:'all 0.22s var(--ease)' }}
+                      onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(6,255,210,0.22)';e.currentTarget.style.boxShadow='0 0 0 1px rgba(6,255,210,0.08), 0 0 24px rgba(6,255,210,0.07), 0 0 60px rgba(6,255,210,0.04)'}}
+                      onMouseLeave={e=>{e.currentTarget.style.borderColor='var(--b-1)';e.currentTarget.style.boxShadow='none'}}>
 
-                      {/* Image */}
-                      <div style={{ background: 'linear-gradient(135deg, rgba(0,245,255,0.04), rgba(191,0,255,0.04))', padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '130px', borderBottom: '1px solid var(--border-subtle)' }}>
-                        <img src={course.image} alt={course.title} style={{ maxHeight: '90px', maxWidth: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(0,245,255,0.2))' }} />
+                      
+                      <div style={{ background:'var(--bg-3)', borderBottom:'1px solid var(--b-1)', height:100, display:'flex', alignItems:'center', justifyContent:'center', padding:'12px', position:'relative' }}>
+                        <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at 80% 20%, rgba(6,255,210,0.04), transparent 60%)' }}/>
+                        <img src={c.image} alt={c.title} style={{ maxHeight:64, maxWidth:'75%', objectFit:'contain', filter:'drop-shadow(0 2px 8px rgba(0,0,0,0.5))' }}/>
                       </div>
 
-                      <div style={{ padding: '16px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                        <h5 style={{ fontFamily: 'var(--font-display)', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '6px', fontSize: '15px' }}>{course.title}</h5>
-                        <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '5px', fontFamily: 'var(--font-body)' }}>
-                          <BookOpen size={11}/> {course.instructor} &nbsp;·&nbsp; <Clock size={11}/> {course.duration}
-                        </p>
-                        <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'var(--font-mono)' }}>
-                          <PlayCircle size={10}/> {course.lessons?.length || 0} lessons
-                        </p>
-
-                        {/* Progress */}
-                        <div style={{ marginBottom: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: '11px', color: pColor, display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'var(--font-mono)', textShadow: `0 0 8px ${pColor}` }}>
-                            {label.icon} {label.text}
-                          </span>
-                          <span style={{ fontSize: '12px', fontFamily: 'var(--font-mono)', fontWeight: '700', color: pColor }}>{progress}%</span>
-                        </div>
-                        <div style={{ height: '5px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden', marginBottom: '16px' }}>
-                          <div style={{ height: '100%', width: `${progress}%`, background: progress === 100 ? 'var(--gradient-matrix)' : pColor === 'var(--neon-orange)' ? 'var(--gradient-fire)' : 'var(--gradient-neon)', borderRadius: '3px', transition: 'width 0.6s ease', boxShadow: `0 0 8px ${pColor}` }} />
+                      <div style={{ padding:'16px', flex:1, display:'flex', flexDirection:'column', gap:10 }}>
+                        <h6 style={{ fontFamily:'var(--font-display)', fontSize:14, fontWeight:700, color:'var(--t-hi)', lineHeight:1.35 }}>{c.title}</h6>
+                        <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:'var(--t-lo)' }}>
+                          <Clock size={11}/><span style={{ fontFamily:'var(--font-mono)' }}>{c.duration}</span>
+                          <span style={{ color:'var(--b-2)' }}>·</span>
+                          <PlayCircle size={11}/>{c.lessons?.length||0} lessons
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
-                          <button onClick={() => navigate(`/Player/${course._id}`)} style={{
-                            background: 'var(--gradient-neon)', border: 'none', borderRadius: '7px',
-                            padding: '9px', fontFamily: 'var(--font-display)', fontWeight: '700',
-                            fontSize: '12px', letterSpacing: '1px', textTransform: 'uppercase',
-                            color: '#000', cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px',
-                            boxShadow: '0 0 15px rgba(0,245,255,0.2)', transition: 'var(--transition)'
-                          }}>
-                            {progress === 100 ? <><RotateCcw size={13}/> Rewatch</> : <><PlayCircle size={13}/> Start Learning</>}
+                        
+                        <div style={{ marginTop:2 }}>
+                          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6 }}>
+                            <span style={{ display:'flex', alignItems:'center', gap:4, fontSize:11, fontFamily:'var(--font-mono)', color: col }}>{lbl.icon}{lbl.text}</span>
+                            <span style={{ fontSize:11, fontFamily:'var(--font-mono)', color:'var(--t-lo)' }}>{prog}%</span>
+                          </div>
+                          <div className="prog-track">
+                            <div className="prog-fill" style={{ width:`${prog}%`, background: col, boxShadow: prog > 0 ? `0 0 8px ${col}55` : 'none' }}/>
+                          </div>
+                        </div>
+
+                        
+                        <div style={{ display:'flex', gap:7, marginTop:'auto' }}>
+                          <button onClick={() => navigate(`/Player/${c._id}`)} className="btn-accent" style={{ flex:1, justifyContent:'center', padding:'8px 10px', fontSize:12 }}>
+                            {prog===100 ? <><RotateCcw size={12}/>Rewatch</> : <><PlayCircle size={12}/>Start</>}
                           </button>
-                          <button onClick={() => handleUnenroll(course._id)} style={{
-                            background: 'rgba(255,0,110,0.06)', border: '1px solid rgba(255,0,110,0.25)', borderRadius: '7px',
-                            padding: '8px', fontFamily: 'var(--font-display)', fontWeight: '600',
-                            fontSize: '12px', letterSpacing: '1px', textTransform: 'uppercase',
-                            color: 'var(--neon-pink)', cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px',
-                            transition: 'var(--transition)'
-                          }}
-                            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,0,110,0.12)'}
-                            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,0,110,0.06)'}>
-                            <UserMinus size={12}/> Unenroll
+                          <button onClick={() => unenroll(c._id)} className="btn-danger" style={{ padding:'8px 10px', fontSize:12 }}>
+                            <UserMinus size={12}/>
                           </button>
                         </div>
                       </div>
@@ -167,5 +126,3 @@ function Mycourses() {
     </div>
   )
 }
-
-export default Mycourses
