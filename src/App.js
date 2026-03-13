@@ -28,6 +28,7 @@ function App() {
         <Route path="/Player/:id" element={<Player />} />
         <Route path="/Admin" element={<Admin />} />
         <Route path="/ForgotPassword" element={<ForgotPassword />} />
+        <Route path="*" element={<Landing />} />
       </Routes>
       <Footer />
     </Router>
