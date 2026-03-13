@@ -15,13 +15,14 @@ export default function Mycourses() {
     fetchMyCourses().then(d => { if (Array.isArray(d)) setCourses(d) })
   }, [navigate])
 
-  const getProgress = id => {
+  const getProgress = (id, totalLessons) => {
     const all = JSON.parse(localStorage.getItem(progKey) || '{}')
     const p = all[id]
     if (!p) return 0
     if (p.overallComplete) return 100
-    if (p.completedLessons?.length > 0) return 50
-    return 0
+    if (!totalLessons || totalLessons === 0) return 0
+    const completed = p.completedLessons?.length || 0
+    return Math.round((completed / totalLessons) * 100)
   }
 
   const unenroll = async id => {
@@ -31,14 +32,14 @@ export default function Mycourses() {
     delete all[id]; localStorage.setItem(progKey, JSON.stringify(all))
   }
 
-  const progColor = v => v === 100 ? 'var(--green)' : v >= 50 ? 'var(--orange)' : 'var(--accent)'
-  const progLabel = v => v === 100 ? {text:'Completed',icon:<Trophy size={12}/>} : v >= 50 ? {text:'In Progress',icon:<Flame size={12}/>} : {text:'Not Started',icon:<BookOpen size={12}/>}
+  const progColor = v => v === 100 ? 'var(--green)' : v > 0 ? 'var(--orange)' : 'var(--accent)'
+  const progLabel = v => v === 100 ? {text:'Completed',icon:<Trophy size={12}/>} : v > 0 ? {text:'In Progress',icon:<Flame size={12}/>} : {text:'Not Started',icon:<BookOpen size={12}/>}
 
   const stats = [
     { val: courses.length,                                     label: 'Enrolled' },
-    { val: courses.filter(c=>getProgress(c._id)===100).length, label: 'Completed' },
-    { val: courses.filter(c=>getProgress(c._id)===50).length,  label: 'In Progress' },
-    { val: courses.filter(c=>getProgress(c._id)===0).length,   label: 'Not Started' },
+    { val: courses.filter(c=>getProgress(c._id, c.lessons?.length)===100).length, label: 'Completed' },
+    { val: courses.filter(c=>{ const p=getProgress(c._id, c.lessons?.length); return p>0 && p<100 }).length,  label: 'In Progress' },
+    { val: courses.filter(c=>getProgress(c._id, c.lessons?.length)===0).length,   label: 'Not Started' },
   ]
 
   return (
@@ -71,7 +72,7 @@ export default function Mycourses() {
             
             <div className="row g-3">
               {courses.map(c => {
-                const prog = getProgress(c._id)
+                const prog = getProgress(c._id, c.lessons?.length)
                 const lbl  = progLabel(prog)
                 const col  = progColor(prog)
                 return (
