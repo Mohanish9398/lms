@@ -15,11 +15,28 @@ export const loginUser = (email, password) =>
     body: JSON.stringify({ email, password })
   }).then(res => res.json())
 
-export const signupUser = (name, email, password) =>
+export const signupUser = (name, email, password, securityQuestion, securityAnswer) =>
   fetch(`${BASE_URL}/api/auth/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email, password })
+    body: JSON.stringify({ name, email, password, securityQuestion, securityAnswer })
+  }).then(res => res.json())
+
+export const getSecurityQuestion = (email) =>
+  fetch(`${BASE_URL}/api/auth/forgot-password/question?email=${encodeURIComponent(email)}`).then(res => res.json())
+
+export const verifySecurityAnswer = (email, securityAnswer) =>
+  fetch(`${BASE_URL}/api/auth/forgot-password/verify`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, securityAnswer })
+  }).then(res => res.json())
+
+export const resetPasswordWithAnswer = (userId, newPassword) =>
+  fetch(`${BASE_URL}/api/auth/forgot-password/reset`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, newPassword })
   }).then(res => res.json())
 
 export const enrollCourse = (courseId) =>

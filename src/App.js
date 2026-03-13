@@ -11,6 +11,7 @@ import AdminLogin from './pages/AdminLogin'
 import Player from './pages/Player'
 import Landing from './pages/Landing'
 import Admin from './pages/Admin'
+import ForgotPassword from './pages/ForgotPassword'
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/AdminLogin" element={<AdminLogin />} />
         <Route path="/Player/:id" element={<Player />} />
         <Route path="/Admin" element={<Admin />} />
+        <Route path="/ForgotPassword" element={<ForgotPassword />} />
       </Routes>
       <Footer />
     </Router>

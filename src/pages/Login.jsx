@@ -64,7 +64,7 @@ export default function Login() {
           <div style={{ marginBottom:18 }}>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:7 }}>
               <label style={{ margin:0 }}>Password</label>
-              <Link to="#" style={{ fontSize:11, color:'var(--t-lo)', fontFamily:'var(--font-mono)', transition:'color 0.15s' }}
+              <Link to="/ForgotPassword" style={{ fontSize:11, color:'var(--t-lo)', fontFamily:'var(--font-mono)', transition:'color 0.15s' }}
                 onMouseEnter={e=>e.currentTarget.style.color='var(--accent)'}
                 onMouseLeave={e=>e.currentTarget.style.color='var(--t-lo)'}>Forgot?</Link>
             </div>
